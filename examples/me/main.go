@@ -15,6 +15,7 @@ const (
 )
 
 func main() {
+	// Get credentials from env vars
 	username, ok := os.LookupEnv("TADO_USERNAME")
 	if !ok {
 		fmt.Fprintf(os.Stderr, "Variable TADO_USERNAME not set\n")
@@ -28,6 +29,7 @@ func main() {
 
 	ctx := context.Background()
 
+	// Create authenticated tado° client
 	client := gotado.NewClient(clientID, clientSecret).WithTimeout(5 * time.Second)
 	client, err := client.WithCredentials(ctx, username, password)
 	if err != nil {
@@ -35,44 +37,21 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Get user info and print some details
 	user, err := gotado.GetMe(client)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get user info: %v\n", err)
 		os.Exit(1)
 	}
 	fmt.Printf("Email: %s\nUsername: %s\nName: %s\n", user.Email, user.Username, user.Name)
+
+	// for each home: get home info and print name and address
 	for _, userHome := range user.Homes {
-		fmt.Printf("Home ID: %d\nHome Name: %s\n", userHome.ID, userHome.Name)
 		home, err := gotado.GetHome(client, &userHome)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to get user home info: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("Address:\n%s\n%s %s\n", *home.Address.AddressLine1, *home.Address.ZipCode, *home.Address.City)
-
-		zones, err := gotado.GetZones(client, &userHome)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to get user home zones: %v\n", err)
-			os.Exit(1)
-		}
-		for _, zone := range zones {
-			fmt.Printf("Zone ID: %d\nZone Name: %s\n", zone.ID, zone.Name)
-			zoneState, err := gotado.GetZoneState(client, &userHome, zone)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to get zone state: %v", err)
-				os.Exit(1)
-			}
-			fmt.Printf("Zone State Mode: %s\n", zoneState.TadoMode)
-			if zoneState.OpenWindow != nil {
-				fmt.Printf("Open window detected at %s", zoneState.OpenWindow.DetectedTime)
-			}
-			if zone.Name == "Bad" {
-				if err := gotado.SetWindowOpen(client, &userHome, zone); err != nil {
-					fmt.Fprintf(os.Stderr, "Failed to close window: %v", err)
-				} else {
-					fmt.Printf("Opened window in %s", zone.Name)
-				}
-			}
-		}
+		fmt.Printf("Home: %s\nAddress:\n%s\n%s %s\n", home.Name, *home.Address.AddressLine1, *home.Address.ZipCode, *home.Address.City)
 	}
 }
