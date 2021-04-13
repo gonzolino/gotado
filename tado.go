@@ -164,7 +164,7 @@ type ZoneStateSensorDataPoints struct {
 	Humidity          *ZoneStateSensorDataPointsHumidity          `json:"humidity"`
 }
 
-// ZoneStateSensorDataPointsInsideTemperature holds information about the inside temperatue of a zone
+// ZoneStateSensorDataPointsInsideTemperature holds information about the inside temperature of a zone
 type ZoneStateSensorDataPointsInsideTemperature struct {
 	Celsius    float64                                             `json:"celsius"`
 	Fahrenheit float64                                             `json:"fahrenheit"`
