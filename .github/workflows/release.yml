@@ -2,21 +2,14 @@ name: Release
 
 on:
   push:
-    tags: [ "v*" ]
+    branches:
+      - main
 
 jobs:
-  build:
-    name: Create Release
+  release:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+      - uses: GoogleCloudPlatform/release-please-action@v2.24.1
+        with:
+          release-type: simple
+          package-name: gotado
