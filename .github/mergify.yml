@@ -1,0 +1,30 @@
+pull_request_rules:
+  - name: Automatic approve for Dependabot
+    conditions:
+      - author=dependabot[bot]
+    actions:
+      review:
+        message: auto approve dependabot
+
+  - name: Automatic approve for owner
+    conditions:
+      - author=gonzolino
+      - "check-success=DeepSource: Go"
+    actions:
+      review:
+        message: auto approve owner
+
+  - name: Automatic merge approved by Mergify
+    conditions:
+      - approved-reviews-by=mergify
+    actions:
+      merge:
+        method: merge
+
+  - name: Automatic merge approved by owner
+    conditions:
+      - approved-reviews-by=gonzolino
+    actions:
+      merge:
+        method: merge
+
