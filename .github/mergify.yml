@@ -16,7 +16,7 @@ pull_request_rules:
 
   - name: Automatic merge approved by Mergify
     conditions:
-      - approved-reviews-by=mergify
+      - approved-reviews-by=mergify[bot]
     actions:
       merge:
         method: merge
