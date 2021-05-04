@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v2.26
+      - uses: GoogleCloudPlatform/release-please-action@v2.27
         with:
           release-type: simple
           package-name: gotado
