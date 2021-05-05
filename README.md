@@ -1,6 +1,7 @@
 # gotado
 
 [![Build Actions Status](https://github.com/gonzolino/gotado/workflows/Build/badge.svg)](https://github.com/gonzolino/gotado/actions) [![Go Report Card](https://goreportcard.com/badge/github.com/gonzolino/gotado)](https://goreportcard.com/report/github.com/gonzolino/gotado) [![PkgGoDev](https://pkg.go.dev/badge/github.com/gonzolino/gotado)](https://pkg.go.dev/github.com/gonzolino/gotado)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgonzolino%2Fgotado.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgonzolino%2Fgotado?ref=badge_shield)
 
 Go client for the tado° Web API. Still in early development, so only a subset of the API functionality is implemented.
 
@@ -43,3 +44,7 @@ Just have a look at the package documentation to learn more about whats possible
 ## Contributing
 
 Please feel free to submit issues and/or pull requests if you discover bugs or missing features.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgonzolino%2Fgotado.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgonzolino%2Fgotado?ref=badge_large)
