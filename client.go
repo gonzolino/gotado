@@ -57,15 +57,20 @@ func (c *Client) WithCredentials(ctx context.Context, username, password string)
 	return c, nil
 }
 
-// Request performs an HTTP request to the tado° API
-func (c *Client) Request(method, url string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create tado° API request: %w", err)
-	}
+// Do sends the given HTTP request to the tado° API.
+func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	resp, err := c.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("unable to talk to tado° API: %w", err)
 	}
 	return resp, nil
+}
+
+// Request performs an HTTP request to the tado° API
+func (c *Client) Request(method, url string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create http request: %w", err)
+	}
+	return c.Do(req)
 }
