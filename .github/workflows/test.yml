@@ -6,8 +6,7 @@ on:
       - main
 
 jobs:
-  test:
-    name: Go Test
+  go-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

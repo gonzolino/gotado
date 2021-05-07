@@ -1,4 +1,4 @@
-name: "CodeQL"
+name: Review
 
 on:
   push:
@@ -11,15 +11,12 @@ on:
     - cron: "19 7 * * 2"
 
 jobs:
-  analyze:
-    name: Analyze
+  codeql:
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
         language: ["go"]
-
     steps:
       - uses: actions/checkout@v2
       - uses: github/codeql-action/init@v1
