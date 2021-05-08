@@ -12,6 +12,7 @@ on:
 
 jobs:
   codeql:
+    name: CodeQL
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -25,6 +26,7 @@ jobs:
       - uses: github/codeql-action/autobuild@v1
       - uses: github/codeql-action/analyze@v1
   gitguardian:
+    name: GitGuardian
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -38,6 +40,7 @@ jobs:
           GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
   fossa:
+    name: FOSSA
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

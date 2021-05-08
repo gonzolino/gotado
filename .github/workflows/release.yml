@@ -7,6 +7,7 @@ on:
 
 jobs:
   release:
+    name: Release Please
     runs-on: ubuntu-latest
     steps:
       - uses: GoogleCloudPlatform/release-please-action@v2
