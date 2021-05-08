@@ -15,7 +15,7 @@ jobs:
         with:
           go-version: 1.16
       - run: go test -coverprofile=cover.out -v ./...
-      - uses: deepsourcelabs/test-coverage-action@v1
+      - uses: deepsourcelabs/test-coverage-action@v1.0.0
         with:
           key: go
           coverage-file: cover.out
