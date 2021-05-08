@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0 # fetch all history so multiple commits can be scanned
-      - uses: GitGuardian/gg-shield-action@v1
+      - uses: GitGuardian/gg-shield-action@v1.1.0
         env:
           GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
           GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
