@@ -218,6 +218,34 @@ type ZoneStateSensorDataPointsHumidity struct {
 	Timestamp  string  `json:"timestamp"`
 }
 
+// ScheduleTimetable is the type of a tado° schedule timetable
+type ScheduleTimetable struct {
+	ID   int32  `json:"id"`
+	Type string `json:"type,omitempty"`
+}
+
+// ScheduleBlock is a block in a tado° schedule
+type ScheduleBlock struct {
+	DayType             string               `json:"dayType"`
+	Start               string               `json:"start"`
+	End                 string               `json:"end"`
+	GeolocationOverride bool                 `json:"geolocationOverride"`
+	Setting             ScheduleBlockSetting `json:"setting"`
+}
+
+// ScheduleBlockSetting holds the setting of a schedule block
+type ScheduleBlockSetting struct {
+	Type        string                           `json:"type"`
+	Power       string                           `json:"power"`
+	Temperature *ScheduleBlockSettingTemperature `json:"temperature,omitempty"`
+}
+
+// ZoneOverlaySettingTemperature holds the temperature of a schedule block setting
+type ScheduleBlockSettingTemperature struct {
+	Celsius    float64 `json:"celsius"`
+	Fahrenheit float64 `json:"fahrenheit"`
+}
+
 // GetMe returns information about the authenticated user.
 func GetMe(client *Client) (*User, error) {
 	resp, err := client.Request(http.MethodGet, apiURL("me"), nil)
@@ -419,5 +447,126 @@ func SetWindowClosed(client *Client, userHome *UserHome, zone *Zone) error {
 	if resp.StatusCode != http.StatusNoContent {
 		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
 	}
+	return nil
+}
+
+// GetTimetables lists available schedule timetables for the given zone
+func GetTimetables(client *Client, userHome *UserHome, zone *Zone) ([]*ScheduleTimetable, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/schedule/timetables", userHome.ID, zone.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	timetables := make([]*ScheduleTimetable, 0)
+	if err := json.NewDecoder(resp.Body).Decode(&timetables); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return timetables, nil
+}
+
+// GetActiveTimetable returns the active schedule timetable for the given zone
+func GetActiveTimetable(client *Client, userHome *UserHome, zone *Zone) (*ScheduleTimetable, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/schedule/activeTimetable", userHome.ID, zone.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	timetable := &ScheduleTimetable{}
+	if err := json.NewDecoder(resp.Body).Decode(&timetable); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return timetable, nil
+}
+
+// SetActiveTimetable sets the active schedule timetable for the given zone
+func SetActiveTimetable(client *Client, userHome *UserHome, zone *Zone, timetable *ScheduleTimetable) error {
+	newTimetable := ScheduleTimetable{ID: timetable.ID}
+	data, err := json.Marshal(newTimetable)
+	if err != nil {
+		return fmt.Errorf("unable to marshal timetable: %w", err)
+	}
+	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/zones/%d/schedule/activeTimetable", userHome.ID, zone.ID), bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("unable to create http request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	respTimetable := &ScheduleTimetable{}
+	if err := json.NewDecoder(resp.Body).Decode(&respTimetable); err != nil {
+		return fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return nil
+}
+
+// GetSchedule returns the heating schedule of the given zone
+func GetSchedule(client *Client, userHome *UserHome, zone *Zone, timetable *ScheduleTimetable) ([]*ScheduleBlock, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/schedule/timetables/%d/blocks", userHome.ID, zone.ID, timetable.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	scheduleBlocks := make([]*ScheduleBlock, 0)
+	if err := json.NewDecoder(resp.Body).Decode(&scheduleBlocks); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return scheduleBlocks, nil
+}
+
+// SetSchedule sets the heating schedule for one block of the given zone
+func SetSchedule(client *Client, userHome *UserHome, zone *Zone, timetable *ScheduleTimetable, schedule []*ScheduleBlock) error {
+	// Order schedule blocks by day types.
+	// For each daytipe we want to send one put request.
+	scheduleMap := map[string][]*ScheduleBlock{}
+	for _, scheduleBlock := range schedule {
+		if _, ok := scheduleMap[scheduleBlock.DayType]; !ok {
+			scheduleMap[scheduleBlock.DayType] = make([]*ScheduleBlock, 0, 1)
+		}
+		scheduleMap[scheduleBlock.DayType] = append(scheduleMap[scheduleBlock.DayType], scheduleBlock)
+	}
+
+	for dayType, scheduleBlocks := range scheduleMap {
+		data, err := json.Marshal(scheduleBlocks)
+		if err != nil {
+			return fmt.Errorf("unable to marshal schedule: %w", err)
+		}
+		req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/zones/%d/schedule/timetables/%d/blocks/%s", userHome.ID, zone.ID, timetable.ID, dayType), bytes.NewReader(data))
+		if err != nil {
+			return fmt.Errorf("unable to create http request: %w", err)
+		}
+		req.Header.Set("Content-Type", "application/json;charset=utf-8")
+		resp, err := client.Do(req)
+		if err != nil {
+			return err
+		}
+
+		if err := isError(resp); err != nil {
+			return fmt.Errorf("tado° API error: %w", err)
+		}
+	}
+
 	return nil
 }
