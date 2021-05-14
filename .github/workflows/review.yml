@@ -5,6 +5,11 @@ on:
     branches:
       - main
   pull_request:
+    types:
+      - edited
+      - opened
+      - synchronize
+      - reopened
     branches:
       - main
   schedule:
