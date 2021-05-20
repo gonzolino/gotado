@@ -2,6 +2,9 @@ pull_request_rules:
   - name: Automatic approve for Dependabot
     conditions:
       - author=dependabot[bot]
+      - "check-success=DeepSource: Go"
+      - "check-success=GitGuardian Security Checks"
+      - "check-success=License Compliance"
     actions:
       review:
         message: auto approve dependabot
