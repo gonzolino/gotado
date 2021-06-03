@@ -77,6 +77,12 @@ type HomeGeolocation struct {
 	Longitude float64 `json:"longitude"`
 }
 
+// HomeState represents the state of a tado° home
+type HomeState struct {
+	Presence       string `json:"presence"`
+	PresenceLocked bool   `json:"presenceLocked"`
+}
+
 // Zone represents a tado° zone
 type Zone struct {
 	ID          int32    `json:"id"`
@@ -285,6 +291,26 @@ func GetHome(client *Client, userHome *UserHome) (*Home, error) {
 	}
 
 	return home, nil
+}
+
+// GetHomeState returns the state of the given home
+func GetHomeState(client *Client, userHome *UserHome) (*HomeState, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/state", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	homeState := &HomeState{}
+	if err := json.NewDecoder(resp.Body).Decode(homeState); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return homeState, nil
 }
 
 // GetZones returns information about the zones in the given home
