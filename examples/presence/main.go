@@ -68,5 +68,52 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to get home state: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("Presence: %s\nPresence Locked: %t\n", state.Presence, state.PresenceLocked)
+	fmt.Printf("Initial Presence: %s", state.Presence)
+	if state.PresenceLocked {
+		fmt.Printf(" (locked)\n")
+	} else {
+		fmt.Println()
+	}
+
+	// Lock presence to 'away'
+	if err := gotado.SetPresenceAway(client, home); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to set presence 'away': %v", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Set presence away")
+	time.Sleep(10 * time.Second)
+
+	// Lock presence to 'at home'
+	if err := gotado.SetPresenceHome(client, home); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to set presence 'home': %v", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Set presence home")
+	time.Sleep(10 * time.Second)
+
+	// Set auto presence
+	if err := gotado.SetPresenceAuto(client, home); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to set presence 'auto': %v", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Set presence auto")
+	time.Sleep(10 * time.Second)
+
+	// Return to initial presence settings
+	if state.PresenceLocked {
+		switch state.Presence {
+		case "HOME":
+			err = gotado.SetPresenceHome(client, home)
+		case "AWAY":
+			err = gotado.SetPresenceAway(client, home)
+		}
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to return to initial presence settings: %v", err)
+			os.Exit(1)
+		}
+	}
 }
