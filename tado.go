@@ -77,6 +77,12 @@ type HomeGeolocation struct {
 	Longitude float64 `json:"longitude"`
 }
 
+// HomeState represents the state of a tado° home
+type HomeState struct {
+	Presence       string `json:"presence"`
+	PresenceLocked bool   `json:"presenceLocked"`
+}
+
 // Zone represents a tado° zone
 type Zone struct {
 	ID          int32    `json:"id"`
@@ -246,6 +252,11 @@ type ScheduleBlockSettingTemperature struct {
 	Fahrenheit float64 `json:"fahrenheit"`
 }
 
+// PresenceLock holds a locked presence setting for a home
+type PresenceLock struct {
+	HomePresence string `json:"homePresence"`
+}
+
 // GetMe returns information about the authenticated user.
 func GetMe(client *Client) (*User, error) {
 	resp, err := client.Request(http.MethodGet, apiURL("me"), nil)
@@ -285,6 +296,26 @@ func GetHome(client *Client, userHome *UserHome) (*Home, error) {
 	}
 
 	return home, nil
+}
+
+// GetHomeState returns the state of the given home
+func GetHomeState(client *Client, userHome *UserHome) (*HomeState, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/state", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	homeState := &HomeState{}
+	if err := json.NewDecoder(resp.Body).Decode(homeState); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return homeState, nil
 }
 
 // GetZones returns information about the zones in the given home
@@ -568,5 +599,57 @@ func SetSchedule(client *Client, userHome *UserHome, zone *Zone, timetable *Sche
 		}
 	}
 
+	return nil
+}
+
+// setPresenceLock sets a locked presence on the given home (HOME or AWAY)
+func setPresenceLock(client *Client, userHome *UserHome, presence PresenceLock) error {
+	data, err := json.Marshal(presence)
+	if err != nil {
+		return fmt.Errorf("unable to marshal presence lock: %w", err)
+	}
+	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/presenceLock", userHome.ID), bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("unable to create http request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	return nil
+}
+
+// SetPresenceHome sets the geofencing presence to 'at home'
+func SetPresenceHome(client *Client, userHome *UserHome) error {
+	presence := PresenceLock{
+		HomePresence: "HOME",
+	}
+	return setPresenceLock(client, userHome, presence)
+}
+
+// SetPresenceAway sets the geofencing presence to 'away'
+func SetPresenceAway(client *Client, userHome *UserHome) error {
+	presence := PresenceLock{
+		HomePresence: "AWAY",
+	}
+	return setPresenceLock(client, userHome, presence)
+}
+
+// SetPresenceAuto removes a locked geofencing presence and returns to auto mode
+func SetPresenceAuto(client *Client, userHome *UserHome) error {
+	resp, err := client.Request(http.MethodDelete, apiURL("homes/%d/presenceLock", userHome.ID), nil)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
+	}
 	return nil
 }
