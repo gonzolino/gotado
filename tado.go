@@ -257,6 +257,12 @@ type PresenceLock struct {
 	HomePresence string `json:"homePresence"`
 }
 
+// EarlyStart controls whether tado° ensures that a set temperature is reached
+// at the start of a block.
+type EarlyStart struct {
+	Enabled bool `json:"enabled"`
+}
+
 // GetMe returns information about the authenticated user.
 func GetMe(client *Client) (*User, error) {
 	resp, err := client.Request(http.MethodGet, apiURL("me"), nil)
@@ -652,4 +658,62 @@ func SetPresenceAuto(client *Client, userHome *UserHome) error {
 		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
 	}
 	return nil
+}
+
+// IsEarlyStartEnabled returns if the given zone has turned on early start
+func IsEarlyStartEnabled(client *Client, userHome *UserHome, zone *Zone) (bool, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/earlyStart", userHome.ID, zone.ID), nil)
+	if err != nil {
+		return false, err
+	}
+
+	if err := isError(resp); err != nil {
+		return false, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	earlyStart := &EarlyStart{}
+	if err := json.NewDecoder(resp.Body).Decode(&earlyStart); err != nil {
+		return false, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return earlyStart.Enabled, nil
+}
+
+// setEarlyStart sets the early start setting for the given zone
+func setEarlyStart(client *Client, userHome *UserHome, zone *Zone, earlyStart EarlyStart) error {
+	data, err := json.Marshal(earlyStart)
+	if err != nil {
+		return fmt.Errorf("unable to marshal early start: %w", err)
+	}
+	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/zones/%d/earlyStart", userHome.ID, zone.ID), bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("unable to create http request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	return nil
+}
+
+// EnableEarlyStart enables early start in the given zone
+func EnableEarlyStart(client *Client, userHome *UserHome, zone *Zone) error {
+	earlyStart := EarlyStart{
+		Enabled: true,
+	}
+	return setEarlyStart(client, userHome, zone, earlyStart)
+}
+
+// DisableEarlyStart disables early start in the given zone
+func DisableEarlyStart(client *Client, userHome *UserHome, zone *Zone) error {
+	earlyStart := EarlyStart{
+		Enabled: false,
+	}
+	return setEarlyStart(client, userHome, zone, earlyStart)
 }
