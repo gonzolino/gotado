@@ -252,6 +252,28 @@ type ScheduleBlockSettingTemperature struct {
 	Fahrenheit float64 `json:"fahrenheit"`
 }
 
+// AwayConfiguration holds the settings to use when everybody leaves the house
+type AwayConfiguration struct {
+	Type       string `json:"type"`
+	AutoAdjust bool   `json:"autoAdjust"`
+	// Comfort Level must be 0 (Eco), 50 (Balanced) or 100 (Comfort)
+	ComfortLevel int32                     `json:"comfortLevel"`
+	Setting      *AwayConfigurationSetting `json:"setting"`
+}
+
+// AwayConfigurationSetting holds the setting of an away configuration
+type AwayConfigurationSetting struct {
+	Type        string                               `json:"type"`
+	Power       string                               `json:"power"`
+	Temperature *AwayConfigurationSettingTemperature `json:"temperature,omitempty"`
+}
+
+// AwayConfigurationSettingTemperature holds the temperature of an away configuration setting
+type AwayConfigurationSettingTemperature struct {
+	Celsius    float64 `json:"celsius"`
+	Fahrenheit float64 `json:"fahrenheit"`
+}
+
 // PresenceLock holds a locked presence setting for a home
 type PresenceLock struct {
 	HomePresence string `json:"homePresence"`
@@ -606,6 +628,88 @@ func SetSchedule(client *Client, userHome *UserHome, zone *Zone, timetable *Sche
 	}
 
 	return nil
+}
+
+// GetAwayConfiguration returns the away configuration of the given zone
+func GetAwayConfiguration(client *Client, userHome *UserHome, zone *Zone) (*AwayConfiguration, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/schedule/awayConfiguration", userHome.ID, zone.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	awayConfig := &AwayConfiguration{}
+	if err := json.NewDecoder(resp.Body).Decode(&awayConfig); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return awayConfig, nil
+}
+
+// SetAwayConfiguration sets an away configuration for the given zone
+func SetAwayConfiguration(client *Client, userHome *UserHome, zone *Zone, awayConfig *AwayConfiguration) error {
+	data, err := json.Marshal(awayConfig)
+	if err != nil {
+		return fmt.Errorf("unable to marshal away configuration: %w", err)
+	}
+	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/zones/%d/schedule/awayConfiguration", userHome.ID, zone.ID), bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("unable to create http request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	return nil
+}
+
+// SetAwayTemperature sets the manual temperature for a zone when everybody leaves the house
+func SetAwayTemperature(client *Client, userHome *UserHome, zone *Zone, temperature float64) error {
+	home, err := GetHome(client, userHome)
+	if err != nil || home == nil {
+		return fmt.Errorf("unable to determine temperature unit")
+	}
+	temperatureSetting := &AwayConfigurationSettingTemperature{}
+	switch home.TemperatureUnit {
+	case "CELSIUS":
+		temperatureSetting.Celsius = temperature
+	case "FAHRENHEIT":
+		temperatureSetting.Fahrenheit = temperature
+	default:
+		return fmt.Errorf("invalid temperature unit '%s'", home.TemperatureUnit)
+	}
+
+	awayConfig := &AwayConfiguration{
+		Type:       "HEATING",
+		AutoAdjust: false,
+		Setting: &AwayConfigurationSetting{
+			Type:        "HEATING",
+			Power:       "ON",
+			Temperature: temperatureSetting,
+		},
+	}
+
+	return SetAwayConfiguration(client, userHome, zone, awayConfig)
+}
+
+// SetAwayComfortLevel sets the away configuration to auto-adjust at the given comfort level ("preheat").
+// Allowed values got the comfort level are 0, 50 and 100 (Eco, Balanced, Comfort)
+func SetAwayComfortLevel(client *Client, userHome *UserHome, zone *Zone, comfortLevel int32) error {
+	awayConfig := &AwayConfiguration{
+		Type:         "HEATING",
+		AutoAdjust:   true,
+		ComfortLevel: comfortLevel,
+	}
+	return SetAwayConfiguration(client, userHome, zone, awayConfig)
 }
 
 // setPresenceLock sets a locked presence on the given home (HOME or AWAY)
