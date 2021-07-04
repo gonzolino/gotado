@@ -307,6 +307,42 @@ type EarlyStart struct {
 	Enabled bool `json:"enabled"`
 }
 
+// Weather holds weather information from the home's location
+type Weather struct {
+	SolarIntensity     *WeatherSolarIntensity     `json:"solarIntensity"`
+	OutsideTemperature *WeatherOutsideTemperature `json:"outsideTemperature"`
+	WeatherState       *WeatherState              `json:"weatherState"`
+}
+
+// WeatherSolarIntensity holds the solar intensity at the home's location as a percentage
+type WeatherSolarIntensity struct {
+	Type       string  `json:"type"`
+	Percentage float64 `json:"percentage"`
+	Timestamp  string  `json:"timestamp"`
+}
+
+// WeatherOutsideTemperature holds the temperature outside of the home
+type WeatherOutsideTemperature struct {
+	Celsius    float64                            `json:"celsius"`
+	Fahrenheit float64                            `json:"fahrenheit"`
+	Timestamp  string                             `json:"timestamp"`
+	Type       string                             `json:"type"`
+	Precision  WeatherOutsideTemperaturePrecision `json:"precision"`
+}
+
+// WeatherOutsideTemperaturePrecision holds the precision of the home's outside temperature
+type WeatherOutsideTemperaturePrecision struct {
+	Celsius    float64 `json:"celsius"`
+	Fahrenheit float64 `json:"fahrenheit"`
+}
+
+// WeatherState stores the state of the weather, e.g. rain, sunny, foggy...
+type WeatherState struct {
+	Type      string `json:"type"`
+	Value     string `json:"value"`
+	Timestamp string `json:"timestamp"`
+}
+
 // GetMe returns information about the authenticated user.
 func GetMe(client *Client) (*User, error) {
 	resp, err := client.Request(http.MethodGet, apiURL("me"), nil)
@@ -862,4 +898,24 @@ func DisableEarlyStart(client *Client, userHome *UserHome, zone *Zone) error {
 		Enabled: false,
 	}
 	return setEarlyStart(client, userHome, zone, earlyStart)
+}
+
+// GetWeather returns weather information at the given homes location
+func GetWeather(client *Client, userHome *UserHome) (*Weather, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/weather", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	weather := &Weather{}
+	if err := json.NewDecoder(resp.Body).Decode(&weather); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return weather, nil
 }
