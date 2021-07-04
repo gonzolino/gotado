@@ -111,6 +111,28 @@ type ZoneOpenWindowDetection struct {
 	TimeoutInSeconds int32 `json:"timeoutInSeconds"`
 }
 
+// ZoneCapabilitiesstores the capabilities of a zone, such as the supported
+// min/max temperatures
+type ZoneCapabilities struct {
+	Type              string                        `json:"type"`
+	CanSetTemperature *bool                         `json:"canSetTemperature,omitempty"`
+	Temperatures      *ZoneCapabilitiesTemperatures `json:"temperatures,omitempty"`
+}
+
+// ZoneCapabilitiesTemperatures holds the temperature related capabilities of a zone
+type ZoneCapabilitiesTemperatures struct {
+	Celsius    *ZoneCapabilitiesTemperatureValues `json:"celsius,omitempty"`
+	Fahrenheit *ZoneCapabilitiesTemperatureValues `json:"fahrenheit,omitempty"`
+}
+
+// ZoneCapabilitiesTemperatureValues holds the numeric values of temperature
+// related capabilities of a zone
+type ZoneCapabilitiesTemperatureValues struct {
+	Min  int32   `json:"min"`
+	Max  int32   `json:"max"`
+	Step float32 `json:"step"`
+}
+
 // ZoneState represents the state of a tado° zone
 type ZoneState struct {
 	TadoMode            string `json:"tadoMode"`
@@ -384,6 +406,26 @@ func GetZoneState(client *Client, userHome *UserHome, zone *Zone) (*ZoneState, e
 	}
 
 	return zoneState, nil
+}
+
+// GetZoneCapabilities returns the capabilities of the given zone
+func GetZoneCapabilities(client *Client, userHome *UserHome, zone *Zone) (*ZoneCapabilities, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/capabilities", userHome.ID, zone.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	zoneCapabilities := &ZoneCapabilities{}
+	if err := json.NewDecoder(resp.Body).Decode(&zoneCapabilities); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return zoneCapabilities, nil
 }
 
 // setZoneOverlay sets a zone overlay setting
