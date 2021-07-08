@@ -375,6 +375,15 @@ type DeviceMountingState struct {
 	Timestamp string `json:"timestamp"`
 }
 
+// Installation holds information about a tado° hardware installation
+type Installation struct {
+	ID       int32    `json:"id"`
+	Type     string   `json:"type"`
+	Revision int32    `json:"revision"`
+	State    string   `json:"state"`
+	Devices  []Device `json:"devices"`
+}
+
 // GetMe returns information about the authenticated user.
 func GetMe(client *Client) (*User, error) {
 	resp, err := client.Request(http.MethodGet, apiURL("me"), nil)
@@ -970,4 +979,24 @@ func GetDevices(client *Client, userHome *UserHome) ([]*Device, error) {
 	}
 
 	return devices, nil
+}
+
+// GetInstallations lists all installations in the given home
+func GetInstallations(client *Client, userHome *UserHome) ([]*Installation, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/installations", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	installations := []*Installation{}
+	if err := json.NewDecoder(resp.Body).Decode(&installations); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return installations, nil
 }

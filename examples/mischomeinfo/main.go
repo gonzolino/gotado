@@ -83,4 +83,15 @@ func main() {
 	for _, device := range devices {
 		fmt.Printf("Type: %s, Firmware: %s\n", device.DeviceType, device.CurrentFwVersion)
 	}
+
+	// Get Installations
+	installations, err := gotado.GetInstallations(client, home)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to get installations: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Println("Installations:")
+	for _, installation := range installations {
+		fmt.Printf("Type: %s, State: %s, Devices: %d\n", installation.Type, installation.State, len(installation.Devices))
+	}
 }
