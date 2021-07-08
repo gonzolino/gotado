@@ -72,4 +72,15 @@ func main() {
 	fmt.Printf("Solar Intensity: %.2f\n", weather.SolarIntensity.Percentage)
 	fmt.Printf("Outside Temperature: %.2f °C\n", weather.OutsideTemperature.Celsius)
 	fmt.Printf("Weather State: %s\n", weather.WeatherState.Value)
+
+	// Get Devices
+	devices, err := gotado.GetDevices(client, home)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to get devices: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Println("Devices:")
+	for _, device := range devices {
+		fmt.Printf("Type: %s, Firmware: %s\n", device.DeviceType, device.CurrentFwVersion)
+	}
 }

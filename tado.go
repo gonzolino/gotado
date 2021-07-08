@@ -343,6 +343,38 @@ type WeatherState struct {
 	Timestamp string `json:"timestamp"`
 }
 
+// Device represents a tado° device such as a thermostat or a bridge
+type Device struct {
+	DeviceType       string                `json:"deviceType"`
+	SerialNo         string                `json:"serialNo"`
+	ShortSerialNo    string                `json:"shortSerialNo"`
+	CurrentFwVersion string                `json:"currentFwVersion"`
+	ConnectionState  DeviceConnectionState `json:"connectionState"`
+	Characteristics  DeviceCharacteristics `json:"characteristics"`
+	InPairingMode    *bool                 `json:"inPairingMode,omitempty"`
+	MountingState    *DeviceMountingState  `json:"mountingState,omitempty"`
+	BatteryState     *string               `json:"batteryState,omitempty"`
+	ChildLockEnabled *bool                 `json:"childLockEnabled,omitempty"`
+	GatewayOperation *string               `json:"gatewayOperation,omitempty"`
+}
+
+// DeviceConnectionState specifies if the device is connected or not
+type DeviceConnectionState struct {
+	Value     bool   `json:"value"`
+	Timestamp string `json:"timestamp"`
+}
+
+// DeviceCharacteristics lists the capabilities of a device
+type DeviceCharacteristics struct {
+	Capabilities []string `json:"characteristics"`
+}
+
+// DeviceMountingState holds the mounting state of a device, e.g. if it is calibrated
+type DeviceMountingState struct {
+	Value     string `json:"value"`
+	Timestamp string `json:"timestamp"`
+}
+
 // GetMe returns information about the authenticated user.
 func GetMe(client *Client) (*User, error) {
 	resp, err := client.Request(http.MethodGet, apiURL("me"), nil)
@@ -918,4 +950,24 @@ func GetWeather(client *Client, userHome *UserHome) (*Weather, error) {
 	}
 
 	return weather, nil
+}
+
+// GetDevices lists all devices in the given home
+func GetDevices(client *Client, userHome *UserHome) ([]*Device, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/devices", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	devices := []*Device{}
+	if err := json.NewDecoder(resp.Body).Decode(&devices); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return devices, nil
 }
