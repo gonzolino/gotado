@@ -94,4 +94,19 @@ func main() {
 	for _, installation := range installations {
 		fmt.Printf("Type: %s, State: %s, Devices: %d\n", installation.Type, installation.State, len(installation.Devices))
 	}
+
+	// Get mobile Devices
+	mobileDevices, err := gotado.GetMobileDevices(client, home)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to get mobile devices: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Println("Mobile Devices:")
+	for _, mobileDevice := range mobileDevices {
+		fmt.Printf("Name: %s, Device: %s, OS: %s (%s)\n",
+			mobileDevice.Name,
+			mobileDevice.DeviceMetadata.Model,
+			mobileDevice.DeviceMetadata.Platform,
+			mobileDevice.DeviceMetadata.OSVersion)
+	}
 }

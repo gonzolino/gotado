@@ -384,6 +384,53 @@ type Installation struct {
 	Devices  []Device `json:"devices"`
 }
 
+// MobileDevice represents a mobile device with the tado° app installed
+type MobileDevice struct {
+	Name           string                `json:"name"`
+	ID             int32                 `json:"id"`
+	Settings       MobileDeviceSettings  `json:"settings"`
+	Location       *MobileDeviceLocation `json:"location"`
+	DeviceMetadata MobileDeviceMetadata  `json:"deviceMetadata"`
+}
+
+// MobileDeviceSettings holds the settings of a mobile device
+type MobileDeviceSettings struct {
+	GeoTrackingEnabled bool                                  `json:"geoTrackingEnabled"`
+	PushNotifications  MobileDeviceSettingsPushNotifications `json:"pushNotifications"`
+}
+
+// MobileDeviceSettingsPushNotifications holds the push notification settings
+type MobileDeviceSettingsPushNotifications struct {
+	LowBatteryReminder          bool `json:"lowBatteryReminder"`
+	AwayModeReminder            bool `json:"awayModeReminder"`
+	HomeModeReminder            bool `json:"homeModeReminder"`
+	OpenWindowReminder          bool `json:"openWindowReminder"`
+	EnergySavingsReportReminder bool `json:"energySavingsReportReminder"`
+	IncidentDetection           bool `json:"incidentDetection"`
+}
+
+// MobileDeviceLocation holds information regarding the current location of  mobile device
+type MobileDeviceLocation struct {
+	Stale                         bool                                `json:"stale"`
+	AtHome                        bool                                `json:"atHome"`
+	BearingFromHome               MobileDeviceLocationBearingFromHome `json:"bearingFromHome"`
+	RelativeDistanceFromHomeFence float64                             `json:"relativeDistanceFromHomeFence"`
+}
+
+// MobileDeviceLocationBearingFromHome holds the current bearing of a mobile device from the home
+type MobileDeviceLocationBearingFromHome struct {
+	Degrees float64 `json:"degrees"`
+	Radians float64 `json:"radians"`
+}
+
+// MobileDeviceMetadata holds some general metadata about a mobile device
+type MobileDeviceMetadata struct {
+	Platform  string `json:"platform"`
+	OSVersion string `json:"osVersion"`
+	Model     string `json:"model"`
+	Locale    string `json:"locale"`
+}
+
 // GetMe returns information about the authenticated user.
 func GetMe(client *Client) (*User, error) {
 	resp, err := client.Request(http.MethodGet, apiURL("me"), nil)
@@ -999,4 +1046,24 @@ func GetInstallations(client *Client, userHome *UserHome) ([]*Installation, erro
 	}
 
 	return installations, nil
+}
+
+// GetMobileDevices lists all mobile devices linked to the given home
+func GetMobileDevices(client *Client, userHome *UserHome) ([]*MobileDevice, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/mobileDevices", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	mobileDevices := []*MobileDevice{}
+	if err := json.NewDecoder(resp.Body).Decode(&mobileDevices); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return mobileDevices, nil
 }
