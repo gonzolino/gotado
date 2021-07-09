@@ -11,13 +11,13 @@ import (
 
 // User represents a tado° user
 type User struct {
-	Name     string     `json:"name"`
-	Email    string     `json:"email"`
-	Username string     `json:"username"`
-	ID       string     `json:"id"`
-	Homes    []UserHome `json:"homes"`
-	Locale   string     `json:"locale"`
-	// TODO: MobileDevices missing
+	Name          string         `json:"name"`
+	Email         string         `json:"email"`
+	Username      string         `json:"username"`
+	ID            string         `json:"id"`
+	Homes         []UserHome     `json:"homes"`
+	Locale        string         `json:"locale"`
+	MobileDevices []MobileDevice `json:"mobileDevices"`
 }
 
 // UserHome represents a home in a user object
@@ -1066,4 +1066,24 @@ func GetMobileDevices(client *Client, userHome *UserHome) ([]*MobileDevice, erro
 	}
 
 	return mobileDevices, nil
+}
+
+// GetUsers lists all users and their mobile devices linked to the given home
+func GetUsers(client *Client, userHome *UserHome) ([]*User, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/users", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	users := []*User{}
+	if err := json.NewDecoder(resp.Body).Decode(&users); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return users, nil
 }

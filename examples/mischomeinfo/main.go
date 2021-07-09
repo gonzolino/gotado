@@ -109,4 +109,15 @@ func main() {
 			mobileDevice.DeviceMetadata.Platform,
 			mobileDevice.DeviceMetadata.OSVersion)
 	}
+
+	// Get Users
+	users, err := gotado.GetUsers(client, home)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to get users: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Println("Users:")
+	for _, user := range users {
+		fmt.Printf("Name: %s, Email: %s\n", user.Name, user.Email)
+	}
 }
