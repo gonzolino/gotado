@@ -11,13 +11,13 @@ import (
 
 // User represents a tado° user
 type User struct {
-	Name     string     `json:"name"`
-	Email    string     `json:"email"`
-	Username string     `json:"username"`
-	ID       string     `json:"id"`
-	Homes    []UserHome `json:"homes"`
-	Locale   string     `json:"locale"`
-	// TODO: MobileDevices missing
+	Name          string         `json:"name"`
+	Email         string         `json:"email"`
+	Username      string         `json:"username"`
+	ID            string         `json:"id"`
+	Homes         []UserHome     `json:"homes"`
+	Locale        string         `json:"locale"`
+	MobileDevices []MobileDevice `json:"mobileDevices"`
 }
 
 // UserHome represents a home in a user object
@@ -305,6 +305,130 @@ type PresenceLock struct {
 // at the start of a block.
 type EarlyStart struct {
 	Enabled bool `json:"enabled"`
+}
+
+// Weather holds weather information from the home's location
+type Weather struct {
+	SolarIntensity     *WeatherSolarIntensity     `json:"solarIntensity"`
+	OutsideTemperature *WeatherOutsideTemperature `json:"outsideTemperature"`
+	WeatherState       *WeatherState              `json:"weatherState"`
+}
+
+// WeatherSolarIntensity holds the solar intensity at the home's location as a percentage
+type WeatherSolarIntensity struct {
+	Type       string  `json:"type"`
+	Percentage float64 `json:"percentage"`
+	Timestamp  string  `json:"timestamp"`
+}
+
+// WeatherOutsideTemperature holds the temperature outside of the home
+type WeatherOutsideTemperature struct {
+	Celsius    float64                            `json:"celsius"`
+	Fahrenheit float64                            `json:"fahrenheit"`
+	Timestamp  string                             `json:"timestamp"`
+	Type       string                             `json:"type"`
+	Precision  WeatherOutsideTemperaturePrecision `json:"precision"`
+}
+
+// WeatherOutsideTemperaturePrecision holds the precision of the home's outside temperature
+type WeatherOutsideTemperaturePrecision struct {
+	Celsius    float64 `json:"celsius"`
+	Fahrenheit float64 `json:"fahrenheit"`
+}
+
+// WeatherState stores the state of the weather, e.g. rain, sunny, foggy...
+type WeatherState struct {
+	Type      string `json:"type"`
+	Value     string `json:"value"`
+	Timestamp string `json:"timestamp"`
+}
+
+// Device represents a tado° device such as a thermostat or a bridge
+type Device struct {
+	DeviceType       string                `json:"deviceType"`
+	SerialNo         string                `json:"serialNo"`
+	ShortSerialNo    string                `json:"shortSerialNo"`
+	CurrentFwVersion string                `json:"currentFwVersion"`
+	ConnectionState  DeviceConnectionState `json:"connectionState"`
+	Characteristics  DeviceCharacteristics `json:"characteristics"`
+	InPairingMode    *bool                 `json:"inPairingMode,omitempty"`
+	MountingState    *DeviceMountingState  `json:"mountingState,omitempty"`
+	BatteryState     *string               `json:"batteryState,omitempty"`
+	ChildLockEnabled *bool                 `json:"childLockEnabled,omitempty"`
+	GatewayOperation *string               `json:"gatewayOperation,omitempty"`
+}
+
+// DeviceConnectionState specifies if the device is connected or not
+type DeviceConnectionState struct {
+	Value     bool   `json:"value"`
+	Timestamp string `json:"timestamp"`
+}
+
+// DeviceCharacteristics lists the capabilities of a device
+type DeviceCharacteristics struct {
+	Capabilities []string `json:"characteristics"`
+}
+
+// DeviceMountingState holds the mounting state of a device, e.g. if it is calibrated
+type DeviceMountingState struct {
+	Value     string `json:"value"`
+	Timestamp string `json:"timestamp"`
+}
+
+// Installation holds information about a tado° hardware installation
+type Installation struct {
+	ID       int32    `json:"id"`
+	Type     string   `json:"type"`
+	Revision int32    `json:"revision"`
+	State    string   `json:"state"`
+	Devices  []Device `json:"devices"`
+}
+
+// MobileDevice represents a mobile device with the tado° app installed
+type MobileDevice struct {
+	Name           string                `json:"name"`
+	ID             int32                 `json:"id"`
+	Settings       MobileDeviceSettings  `json:"settings"`
+	Location       *MobileDeviceLocation `json:"location"`
+	DeviceMetadata MobileDeviceMetadata  `json:"deviceMetadata"`
+}
+
+// MobileDeviceSettings holds the settings of a mobile device
+type MobileDeviceSettings struct {
+	GeoTrackingEnabled bool                                  `json:"geoTrackingEnabled"`
+	PushNotifications  MobileDeviceSettingsPushNotifications `json:"pushNotifications"`
+}
+
+// MobileDeviceSettingsPushNotifications holds the push notification settings
+type MobileDeviceSettingsPushNotifications struct {
+	LowBatteryReminder          bool `json:"lowBatteryReminder"`
+	AwayModeReminder            bool `json:"awayModeReminder"`
+	HomeModeReminder            bool `json:"homeModeReminder"`
+	OpenWindowReminder          bool `json:"openWindowReminder"`
+	EnergySavingsReportReminder bool `json:"energySavingsReportReminder"`
+	IncidentDetection           bool `json:"incidentDetection"`
+}
+
+// MobileDeviceLocation holds information regarding the current location of  mobile device
+type MobileDeviceLocation struct {
+	Stale                         bool                                `json:"stale"`
+	AtHome                        bool                                `json:"atHome"`
+	BearingFromHome               MobileDeviceLocationBearingFromHome `json:"bearingFromHome"`
+	RelativeDistanceFromHomeFence float64                             `json:"relativeDistanceFromHomeFence"`
+}
+
+// MobileDeviceLocationBearingFromHome holds the current bearing of a mobile device from the home
+type MobileDeviceLocationBearingFromHome struct {
+	Degrees float64 `json:"degrees"`
+	Radians float64 `json:"radians"`
+}
+
+// MobileDeviceMetadata holds some general metadata about a mobile device
+type MobileDeviceMetadata struct {
+	Platform  string `json:"platform"`
+	OSVersion string `json:"osVersion"`
+	Model     string `json:"model"`
+	Locale    string `json:"locale"`
 }
 
 // GetMe returns information about the authenticated user.
@@ -862,4 +986,104 @@ func DisableEarlyStart(client *Client, userHome *UserHome, zone *Zone) error {
 		Enabled: false,
 	}
 	return setEarlyStart(client, userHome, zone, earlyStart)
+}
+
+// GetWeather returns weather information at the given homes location
+func GetWeather(client *Client, userHome *UserHome) (*Weather, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/weather", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	weather := &Weather{}
+	if err := json.NewDecoder(resp.Body).Decode(&weather); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return weather, nil
+}
+
+// GetDevices lists all devices in the given home
+func GetDevices(client *Client, userHome *UserHome) ([]*Device, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/devices", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	devices := []*Device{}
+	if err := json.NewDecoder(resp.Body).Decode(&devices); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return devices, nil
+}
+
+// GetInstallations lists all installations in the given home
+func GetInstallations(client *Client, userHome *UserHome) ([]*Installation, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/installations", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	installations := []*Installation{}
+	if err := json.NewDecoder(resp.Body).Decode(&installations); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return installations, nil
+}
+
+// GetMobileDevices lists all mobile devices linked to the given home
+func GetMobileDevices(client *Client, userHome *UserHome) ([]*MobileDevice, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/mobileDevices", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	mobileDevices := []*MobileDevice{}
+	if err := json.NewDecoder(resp.Body).Decode(&mobileDevices); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return mobileDevices, nil
+}
+
+// GetUsers lists all users and their mobile devices linked to the given home
+func GetUsers(client *Client, userHome *UserHome) ([]*User, error) {
+	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/users", userHome.ID), nil)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return nil, fmt.Errorf("tado° API error: %w", err)
+	}
+
+	users := []*User{}
+	if err := json.NewDecoder(resp.Body).Decode(&users); err != nil {
+		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return users, nil
 }
