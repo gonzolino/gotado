@@ -395,8 +395,8 @@ type MobileDevice struct {
 
 // MobileDeviceSettings holds the settings of a mobile device
 type MobileDeviceSettings struct {
-	GeoTrackingEnabled bool                                  `json:"geoTrackingEnabled"`
-	PushNotifications  MobileDeviceSettingsPushNotifications `json:"pushNotifications"`
+	GeoTrackingEnabled bool                                   `json:"geoTrackingEnabled"`
+	PushNotifications  *MobileDeviceSettingsPushNotifications `json:"pushNotifications,omitempty"`
 }
 
 // MobileDeviceSettingsPushNotifications holds the push notification settings
