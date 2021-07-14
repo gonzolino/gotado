@@ -1081,6 +1081,29 @@ func DeleteMobileDevice(client *Client, userHome *UserHome, mobileDevice *Mobile
 	return nil
 }
 
+// SetMobileDeviceSettings updates the given mobile device with the given settings
+func SetMobileDeviceSettings(client *Client, userHome *UserHome, mobileDevice *MobileDevice, settings MobileDeviceSettings) error {
+	data, err := json.Marshal(settings)
+	if err != nil {
+		return fmt.Errorf("unable to marshal mobile device settings: %w", err)
+	}
+	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/mobileDevices/%d/settings", userHome.ID, mobileDevice.ID), bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("unable to create http request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	return nil
+}
+
 // GetUsers lists all users and their mobile devices linked to the given home
 func GetUsers(client *Client, userHome *UserHome) ([]*User, error) {
 	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/users", userHome.ID), nil)
