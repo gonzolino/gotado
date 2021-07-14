@@ -395,8 +395,8 @@ type MobileDevice struct {
 
 // MobileDeviceSettings holds the settings of a mobile device
 type MobileDeviceSettings struct {
-	GeoTrackingEnabled bool                                  `json:"geoTrackingEnabled"`
-	PushNotifications  MobileDeviceSettingsPushNotifications `json:"pushNotifications"`
+	GeoTrackingEnabled bool                                   `json:"geoTrackingEnabled"`
+	PushNotifications  *MobileDeviceSettingsPushNotifications `json:"pushNotifications,omitempty"`
 }
 
 // MobileDeviceSettingsPushNotifications holds the push notification settings
@@ -1066,6 +1066,42 @@ func GetMobileDevices(client *Client, userHome *UserHome) ([]*MobileDevice, erro
 	}
 
 	return mobileDevices, nil
+}
+
+// DeleteMobileDevice deletes the given mobile device
+func DeleteMobileDevice(client *Client, userHome *UserHome, mobileDevice *MobileDevice) error {
+	resp, err := client.Request(http.MethodDelete, apiURL("homes/%d/mobileDevices/%d", userHome.ID, mobileDevice.ID), nil)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
+	}
+	return nil
+}
+
+// SetMobileDeviceSettings updates the given mobile device with the given settings
+func SetMobileDeviceSettings(client *Client, userHome *UserHome, mobileDevice *MobileDevice, settings MobileDeviceSettings) error {
+	data, err := json.Marshal(settings)
+	if err != nil {
+		return fmt.Errorf("unable to marshal mobile device settings: %w", err)
+	}
+	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/mobileDevices/%d/settings", userHome.ID, mobileDevice.ID), bytes.NewReader(data))
+	if err != nil {
+		return fmt.Errorf("unable to create http request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	return nil
 }
 
 // GetUsers lists all users and their mobile devices linked to the given home
