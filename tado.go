@@ -1068,6 +1068,19 @@ func GetMobileDevices(client *Client, userHome *UserHome) ([]*MobileDevice, erro
 	return mobileDevices, nil
 }
 
+// DeleteMobileDevice deletes the given mobile device
+func DeleteMobileDevice(client *Client, userHome *UserHome, mobileDevice *MobileDevice) error {
+	resp, err := client.Request(http.MethodDelete, apiURL("homes/%d/mobileDevices/%d", userHome.ID, mobileDevice.ID), nil)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
+	}
+	return nil
+}
+
 // GetUsers lists all users and their mobile devices linked to the given home
 func GetUsers(client *Client, userHome *UserHome) ([]*User, error) {
 	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/users", userHome.ID), nil)
