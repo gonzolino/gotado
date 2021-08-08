@@ -12,5 +12,6 @@ jobs:
     steps:
       - uses: GoogleCloudPlatform/release-please-action@v2.29
         with:
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           release-type: simple
           package-name: gotado
