@@ -42,7 +42,7 @@ func (m *AirConditioningCapabilities) Type() TadoSystemType {
 }
 
 // SetType sets the type of this subtype
-func (m *AirConditioningCapabilities) SetType(val TadoSystemType) {
+func (m *AirConditioningCapabilities) SetType(_ TadoSystemType) {
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure

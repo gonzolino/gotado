@@ -77,7 +77,7 @@ func (m *HomeInfo) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *HomeInfo) validateAwayRadiusInMeters(formats strfmt.Registry) error {
+func (m *HomeInfo) validateAwayRadiusInMeters(_ strfmt.Registry) error {
 
 	if err := validate.Required("awayRadiusInMeters", "body", m.AwayRadiusInMeters); err != nil {
 		return err
@@ -86,7 +86,7 @@ func (m *HomeInfo) validateAwayRadiusInMeters(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *HomeInfo) validateDateTimeZone(formats strfmt.Registry) error {
+func (m *HomeInfo) validateDateTimeZone(_ strfmt.Registry) error {
 
 	if err := validate.Required("dateTimeZone", "body", m.DateTimeZone); err != nil {
 		return err
@@ -112,7 +112,7 @@ func (m *HomeInfo) validateGeolocation(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *HomeInfo) validateID(formats strfmt.Registry) error {
+func (m *HomeInfo) validateID(_ strfmt.Registry) error {
 
 	if err := validate.Required("id", "body", m.ID); err != nil {
 		return err
@@ -121,7 +121,7 @@ func (m *HomeInfo) validateID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *HomeInfo) validateName(formats strfmt.Registry) error {
+func (m *HomeInfo) validateName(_ strfmt.Registry) error {
 
 	if err := validate.Required("name", "body", m.Name); err != nil {
 		return err

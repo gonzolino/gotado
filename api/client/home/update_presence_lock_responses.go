@@ -80,7 +80,7 @@ func (o *UpdatePresenceLockOK) Error() string {
 	return fmt.Sprintf("[PUT /homes/{home_id}/presenceLock][%d] updatePresenceLockOK ", 200)
 }
 
-func (o *UpdatePresenceLockOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdatePresenceLockOK) readResponse(_ runtime.ClientResponse, _ runtime.Consumer, _ strfmt.Registry) error {
 
 	return nil
 }
@@ -105,7 +105,7 @@ func (o *UpdatePresenceLockBadRequest) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *UpdatePresenceLockBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdatePresenceLockBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -137,7 +137,7 @@ func (o *UpdatePresenceLockUnauthorized) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *UpdatePresenceLockUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdatePresenceLockUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -169,7 +169,7 @@ func (o *UpdatePresenceLockForbidden) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *UpdatePresenceLockForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdatePresenceLockForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -201,7 +201,7 @@ func (o *UpdatePresenceLockNotFound) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *UpdatePresenceLockNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdatePresenceLockNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -233,7 +233,7 @@ func (o *UpdatePresenceLockUnprocessableEntity) GetPayload() *models.ClientError
 	return o.Payload
 }
 
-func (o *UpdatePresenceLockUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdatePresenceLockUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 

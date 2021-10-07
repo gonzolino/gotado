@@ -46,7 +46,7 @@ func (m *Geolocation) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Geolocation) validateLatitude(formats strfmt.Registry) error {
+func (m *Geolocation) validateLatitude(_ strfmt.Registry) error {
 
 	if err := validate.Required("latitude", "body", m.Latitude); err != nil {
 		return err
@@ -55,7 +55,7 @@ func (m *Geolocation) validateLatitude(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Geolocation) validateLongitude(formats strfmt.Registry) error {
+func (m *Geolocation) validateLongitude(_ strfmt.Registry) error {
 
 	if err := validate.Required("longitude", "body", m.Longitude); err != nil {
 		return err
@@ -65,7 +65,7 @@ func (m *Geolocation) validateLongitude(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this geolocation based on context it is used
-func (m *Geolocation) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *Geolocation) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

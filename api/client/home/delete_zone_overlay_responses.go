@@ -68,7 +68,7 @@ func (o *DeleteZoneOverlayNoContent) Error() string {
 	return fmt.Sprintf("[DELETE /homes/{home_id}/zones/{zone_id}/overlay][%d] deleteZoneOverlayNoContent ", 204)
 }
 
-func (o *DeleteZoneOverlayNoContent) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *DeleteZoneOverlayNoContent) readResponse(_ runtime.ClientResponse, _ runtime.Consumer, _ strfmt.Registry) error {
 
 	return nil
 }
@@ -93,7 +93,7 @@ func (o *DeleteZoneOverlayUnauthorized) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *DeleteZoneOverlayUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *DeleteZoneOverlayUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -125,7 +125,7 @@ func (o *DeleteZoneOverlayForbidden) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *DeleteZoneOverlayForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *DeleteZoneOverlayForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -157,7 +157,7 @@ func (o *DeleteZoneOverlayNotFound) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *DeleteZoneOverlayNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *DeleteZoneOverlayNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 

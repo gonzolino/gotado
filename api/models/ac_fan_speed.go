@@ -60,7 +60,7 @@ func (m AcFanSpeed) validateAcFanSpeedEnum(path, location string, value AcFanSpe
 }
 
 // Validate validates this ac fan speed
-func (m AcFanSpeed) Validate(formats strfmt.Registry) error {
+func (m AcFanSpeed) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	// value enum
@@ -75,6 +75,6 @@ func (m AcFanSpeed) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this ac fan speed based on context it is used
-func (m AcFanSpeed) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m AcFanSpeed) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }

@@ -86,14 +86,14 @@ const (
 )
 
 // prop value enum
-func (m *Link) validateStateEnum(path, location string, value string) error {
+func (m *Link) validateStateEnum(path, location, value string) error {
 	if err := validate.EnumCase(path, location, value, linkTypeStatePropEnum, true); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Link) validateState(formats strfmt.Registry) error {
+func (m *Link) validateState(_ strfmt.Registry) error {
 
 	if err := validate.Required("state", "body", m.State); err != nil {
 		return err
@@ -166,12 +166,12 @@ type LinkReason struct {
 }
 
 // Validate validates this link reason
-func (m *LinkReason) Validate(formats strfmt.Registry) error {
+func (m *LinkReason) Validate(_ strfmt.Registry) error {
 	return nil
 }
 
 // ContextValidate validates this link reason based on context it is used
-func (m *LinkReason) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *LinkReason) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

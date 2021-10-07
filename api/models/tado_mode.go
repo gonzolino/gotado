@@ -57,7 +57,7 @@ func (m TadoMode) validateTadoModeEnum(path, location string, value TadoMode) er
 }
 
 // Validate validates this tado mode
-func (m TadoMode) Validate(formats strfmt.Registry) error {
+func (m TadoMode) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	// value enum
@@ -72,6 +72,6 @@ func (m TadoMode) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this tado mode based on context it is used
-func (m TadoMode) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m TadoMode) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }

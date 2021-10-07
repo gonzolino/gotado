@@ -39,7 +39,7 @@ func (m *TadoModeTerminationCondition) Type() OverlayTerminationConditionType {
 }
 
 // SetType sets the type of this subtype
-func (m *TadoModeTerminationCondition) SetType(val OverlayTerminationConditionType) {
+func (m *TadoModeTerminationCondition) SetType(_ OverlayTerminationConditionType) {
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -150,7 +150,7 @@ func (m *TadoModeTerminationCondition) ContextValidate(ctx context.Context, form
 	return nil
 }
 
-func (m *TadoModeTerminationCondition) contextValidateProjectedExpiry(ctx context.Context, formats strfmt.Registry) error {
+func (m *TadoModeTerminationCondition) contextValidateProjectedExpiry(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "projectedExpiry", "body", strfmt.DateTime(m.ProjectedExpiry())); err != nil {
 		return err

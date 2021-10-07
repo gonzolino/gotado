@@ -46,7 +46,7 @@ func (m *ClientError) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ClientError) validateCode(formats strfmt.Registry) error {
+func (m *ClientError) validateCode(_ strfmt.Registry) error {
 
 	if err := validate.Required("code", "body", m.Code); err != nil {
 		return err
@@ -55,7 +55,7 @@ func (m *ClientError) validateCode(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ClientError) validateTitle(formats strfmt.Registry) error {
+func (m *ClientError) validateTitle(_ strfmt.Registry) error {
 
 	if err := validate.Required("title", "body", m.Title); err != nil {
 		return err
@@ -65,7 +65,7 @@ func (m *ClientError) validateTitle(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this client error based on context it is used
-func (m *ClientError) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *ClientError) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

@@ -77,7 +77,7 @@ func (m *HomeState) validatePresence(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *HomeState) validatePresenceLocked(formats strfmt.Registry) error {
+func (m *HomeState) validatePresenceLocked(_ strfmt.Registry) error {
 
 	if err := validate.Required("presenceLocked", "body", bool(m.PresenceLocked)); err != nil {
 		return err
@@ -112,7 +112,7 @@ func (m *HomeState) ContextValidate(ctx context.Context, formats strfmt.Registry
 	return nil
 }
 
-func (m *HomeState) contextValidateName(ctx context.Context, formats strfmt.Registry) error {
+func (m *HomeState) contextValidateName(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "name", "body", string(m.Name)); err != nil {
 		return err
@@ -135,7 +135,7 @@ func (m *HomeState) contextValidatePresence(ctx context.Context, formats strfmt.
 	return nil
 }
 
-func (m *HomeState) contextValidatePresenceLocked(ctx context.Context, formats strfmt.Registry) error {
+func (m *HomeState) contextValidatePresenceLocked(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "presenceLocked", "body", bool(m.PresenceLocked)); err != nil {
 		return err
@@ -144,7 +144,7 @@ func (m *HomeState) contextValidatePresenceLocked(ctx context.Context, formats s
 	return nil
 }
 
-func (m *HomeState) contextValidateShowHomePresenceSwitchButton(ctx context.Context, formats strfmt.Registry) error {
+func (m *HomeState) contextValidateShowHomePresenceSwitchButton(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "showHomePresenceSwitchButton", "body", m.ShowHomePresenceSwitchButton); err != nil {
 		return err

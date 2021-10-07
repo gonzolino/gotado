@@ -63,7 +63,7 @@ func (m AcMode) validateAcModeEnum(path, location string, value AcMode) error {
 }
 
 // Validate validates this ac mode
-func (m AcMode) Validate(formats strfmt.Registry) error {
+func (m AcMode) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	// value enum
@@ -78,6 +78,6 @@ func (m AcMode) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this ac mode based on context it is used
-func (m AcMode) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m AcMode) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }

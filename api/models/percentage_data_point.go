@@ -49,7 +49,7 @@ func (m *PercentageDataPoint) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *PercentageDataPoint) validatePercentage(formats strfmt.Registry) error {
+func (m *PercentageDataPoint) validatePercentage(_ strfmt.Registry) error {
 
 	if err := validate.Required("percentage", "body", m.Percentage); err != nil {
 		return err
@@ -80,7 +80,7 @@ func (m *PercentageDataPoint) validateTimestamp(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this percentage data point based on context it is used
-func (m *PercentageDataPoint) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *PercentageDataPoint) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

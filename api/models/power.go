@@ -54,7 +54,7 @@ func (m Power) validatePowerEnum(path, location string, value Power) error {
 }
 
 // Validate validates this power
-func (m Power) Validate(formats strfmt.Registry) error {
+func (m Power) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	// value enum
@@ -69,6 +69,6 @@ func (m Power) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this power based on context it is used
-func (m Power) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m Power) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }

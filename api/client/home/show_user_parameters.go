@@ -112,7 +112,7 @@ func (o *ShowUserParams) SetHTTPClient(client *http.Client) {
 }
 
 // WriteToRequest writes these params to a swagger request
-func (o *ShowUserParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
+func (o *ShowUserParams) WriteToRequest(r runtime.ClientRequest, _ strfmt.Registry) error {
 
 	if err := r.SetTimeout(o.timeout); err != nil {
 		return err

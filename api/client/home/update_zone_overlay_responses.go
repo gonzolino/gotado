@@ -84,7 +84,7 @@ func (o *UpdateZoneOverlayOK) GetPayload() *models.Overlay {
 	return o.Payload
 }
 
-func (o *UpdateZoneOverlayOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdateZoneOverlayOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.Overlay)
 
@@ -116,7 +116,7 @@ func (o *UpdateZoneOverlayBadRequest) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *UpdateZoneOverlayBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdateZoneOverlayBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -148,7 +148,7 @@ func (o *UpdateZoneOverlayUnauthorized) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *UpdateZoneOverlayUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdateZoneOverlayUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -180,7 +180,7 @@ func (o *UpdateZoneOverlayForbidden) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *UpdateZoneOverlayForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdateZoneOverlayForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -212,7 +212,7 @@ func (o *UpdateZoneOverlayNotFound) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *UpdateZoneOverlayNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdateZoneOverlayNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -244,7 +244,7 @@ func (o *UpdateZoneOverlayUnprocessableEntity) GetPayload() *models.ClientErrorM
 	return o.Payload
 }
 
-func (o *UpdateZoneOverlayUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *UpdateZoneOverlayUnprocessableEntity) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 

@@ -66,7 +66,7 @@ func (m *overlayTerminationCondition) Type() OverlayTerminationConditionType {
 }
 
 // SetType sets the type of this polymorphic type
-func (m *overlayTerminationCondition) SetType(val OverlayTerminationConditionType) {
+func (m *overlayTerminationCondition) SetType(_ OverlayTerminationConditionType) {
 }
 
 // UnmarshalOverlayTerminationConditionSlice unmarshals polymorphic slices of OverlayTerminationCondition
@@ -187,7 +187,7 @@ func (m *overlayTerminationCondition) ContextValidate(ctx context.Context, forma
 	return nil
 }
 
-func (m *overlayTerminationCondition) contextValidateProjectedExpiry(ctx context.Context, formats strfmt.Registry) error {
+func (m *overlayTerminationCondition) contextValidateProjectedExpiry(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "projectedExpiry", "body", strfmt.DateTime(m.ProjectedExpiry())); err != nil {
 		return err

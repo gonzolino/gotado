@@ -54,7 +54,7 @@ func (m TemperatureUnit) validateTemperatureUnitEnum(path, location string, valu
 }
 
 // Validate validates this temperature unit
-func (m TemperatureUnit) Validate(formats strfmt.Registry) error {
+func (m TemperatureUnit) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	// value enum
@@ -69,6 +69,6 @@ func (m TemperatureUnit) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this temperature unit based on context it is used
-func (m TemperatureUnit) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m TemperatureUnit) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }

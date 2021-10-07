@@ -39,7 +39,7 @@ func (m *ManualTerminationCondition) Type() OverlayTerminationConditionType {
 }
 
 // SetType sets the type of this subtype
-func (m *ManualTerminationCondition) SetType(val OverlayTerminationConditionType) {
+func (m *ManualTerminationCondition) SetType(_ OverlayTerminationConditionType) {
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -150,7 +150,7 @@ func (m *ManualTerminationCondition) ContextValidate(ctx context.Context, format
 	return nil
 }
 
-func (m *ManualTerminationCondition) contextValidateProjectedExpiry(ctx context.Context, formats strfmt.Registry) error {
+func (m *ManualTerminationCondition) contextValidateProjectedExpiry(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "projectedExpiry", "body", strfmt.DateTime(m.ProjectedExpiry())); err != nil {
 		return err

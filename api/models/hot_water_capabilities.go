@@ -35,7 +35,7 @@ func (m *HotWaterCapabilities) Type() TadoSystemType {
 }
 
 // SetType sets the type of this subtype
-func (m *HotWaterCapabilities) SetType(val TadoSystemType) {
+func (m *HotWaterCapabilities) SetType(_ TadoSystemType) {
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -137,7 +137,7 @@ func (m *HotWaterCapabilities) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *HotWaterCapabilities) validateCanSetTemperature(formats strfmt.Registry) error {
+func (m *HotWaterCapabilities) validateCanSetTemperature(_ strfmt.Registry) error {
 
 	if err := validate.Required("canSetTemperature", "body", m.CanSetTemperature); err != nil {
 		return err

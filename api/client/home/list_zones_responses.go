@@ -72,7 +72,7 @@ func (o *ListZonesOK) GetPayload() []*models.Zone {
 	return o.Payload
 }
 
-func (o *ListZonesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListZonesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
@@ -102,7 +102,7 @@ func (o *ListZonesUnauthorized) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ListZonesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListZonesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -134,7 +134,7 @@ func (o *ListZonesForbidden) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ListZonesForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListZonesForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -166,7 +166,7 @@ func (o *ListZonesNotFound) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ListZonesNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListZonesNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 

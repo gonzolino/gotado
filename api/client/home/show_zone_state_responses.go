@@ -72,7 +72,7 @@ func (o *ShowZoneStateOK) GetPayload() *models.ZoneState {
 	return o.Payload
 }
 
-func (o *ShowZoneStateOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneStateOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ZoneState)
 
@@ -104,7 +104,7 @@ func (o *ShowZoneStateUnauthorized) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ShowZoneStateUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneStateUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -136,7 +136,7 @@ func (o *ShowZoneStateForbidden) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ShowZoneStateForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneStateForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -168,7 +168,7 @@ func (o *ShowZoneStateNotFound) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ShowZoneStateNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneStateNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 

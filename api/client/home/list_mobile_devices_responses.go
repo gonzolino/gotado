@@ -72,7 +72,7 @@ func (o *ListMobileDevicesOK) GetPayload() []*models.MobileDevice {
 	return o.Payload
 }
 
-func (o *ListMobileDevicesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListMobileDevicesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
@@ -102,7 +102,7 @@ func (o *ListMobileDevicesUnauthorized) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ListMobileDevicesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListMobileDevicesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -134,7 +134,7 @@ func (o *ListMobileDevicesForbidden) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ListMobileDevicesForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListMobileDevicesForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -166,7 +166,7 @@ func (o *ListMobileDevicesNotFound) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ListMobileDevicesNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ListMobileDevicesNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 

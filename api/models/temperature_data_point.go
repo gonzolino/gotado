@@ -59,7 +59,7 @@ func (m *TemperatureDataPoint) validateTimestamp(formats strfmt.Registry) error 
 }
 
 // ContextValidate validates this temperature data point based on context it is used
-func (m *TemperatureDataPoint) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *TemperatureDataPoint) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

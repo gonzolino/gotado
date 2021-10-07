@@ -54,7 +54,7 @@ func (m *IntRange) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *IntRange) validateMax(formats strfmt.Registry) error {
+func (m *IntRange) validateMax(_ strfmt.Registry) error {
 
 	if err := validate.Required("max", "body", m.Max); err != nil {
 		return err
@@ -63,7 +63,7 @@ func (m *IntRange) validateMax(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *IntRange) validateMin(formats strfmt.Registry) error {
+func (m *IntRange) validateMin(_ strfmt.Registry) error {
 
 	if err := validate.Required("min", "body", m.Min); err != nil {
 		return err
@@ -72,7 +72,7 @@ func (m *IntRange) validateMin(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *IntRange) validateStep(formats strfmt.Registry) error {
+func (m *IntRange) validateStep(_ strfmt.Registry) error {
 
 	if err := validate.Required("step", "body", m.Step); err != nil {
 		return err
@@ -82,7 +82,7 @@ func (m *IntRange) validateStep(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this int range based on context it is used
-func (m *IntRange) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *IntRange) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

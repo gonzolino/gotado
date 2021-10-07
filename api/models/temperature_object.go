@@ -25,12 +25,12 @@ type TemperatureObject struct {
 }
 
 // Validate validates this temperature object
-func (m *TemperatureObject) Validate(formats strfmt.Registry) error {
+func (m *TemperatureObject) Validate(_ strfmt.Registry) error {
 	return nil
 }
 
 // ContextValidate validates this temperature object based on context it is used
-func (m *TemperatureObject) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *TemperatureObject) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

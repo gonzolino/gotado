@@ -52,7 +52,7 @@ func (m *ControlDevice) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ControlDevice) validateDeviceType(formats strfmt.Registry) error {
+func (m *ControlDevice) validateDeviceType(_ strfmt.Registry) error {
 
 	if err := validate.RequiredString("deviceType", "body", m.DeviceType); err != nil {
 		return err
@@ -61,7 +61,7 @@ func (m *ControlDevice) validateDeviceType(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ControlDevice) validateSerialNo(formats strfmt.Registry) error {
+func (m *ControlDevice) validateSerialNo(_ strfmt.Registry) error {
 
 	if err := validate.RequiredString("serialNo", "body", m.SerialNo); err != nil {
 		return err
@@ -92,7 +92,7 @@ func (m *ControlDevice) ContextValidate(ctx context.Context, formats strfmt.Regi
 	return nil
 }
 
-func (m *ControlDevice) contextValidateBatteryState(ctx context.Context, formats strfmt.Registry) error {
+func (m *ControlDevice) contextValidateBatteryState(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "batteryState", "body", string(m.BatteryState)); err != nil {
 		return err
@@ -101,7 +101,7 @@ func (m *ControlDevice) contextValidateBatteryState(ctx context.Context, formats
 	return nil
 }
 
-func (m *ControlDevice) contextValidateDeviceType(ctx context.Context, formats strfmt.Registry) error {
+func (m *ControlDevice) contextValidateDeviceType(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "deviceType", "body", string(m.DeviceType)); err != nil {
 		return err
@@ -110,7 +110,7 @@ func (m *ControlDevice) contextValidateDeviceType(ctx context.Context, formats s
 	return nil
 }
 
-func (m *ControlDevice) contextValidateSerialNo(ctx context.Context, formats strfmt.Registry) error {
+func (m *ControlDevice) contextValidateSerialNo(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "serialNo", "body", string(m.SerialNo)); err != nil {
 		return err

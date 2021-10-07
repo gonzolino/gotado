@@ -133,7 +133,7 @@ func (o *ShowHomeParams) SetHomeID(homeID int64) {
 }
 
 // WriteToRequest writes these params to a swagger request
-func (o *ShowHomeParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
+func (o *ShowHomeParams) WriteToRequest(r runtime.ClientRequest, _ strfmt.Registry) error {
 
 	if err := r.SetTimeout(o.timeout); err != nil {
 		return err

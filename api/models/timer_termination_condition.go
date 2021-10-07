@@ -55,7 +55,7 @@ func (m *TimerTerminationCondition) Type() OverlayTerminationConditionType {
 }
 
 // SetType sets the type of this subtype
-func (m *TimerTerminationCondition) SetType(val OverlayTerminationConditionType) {
+func (m *TimerTerminationCondition) SetType(_ OverlayTerminationConditionType) {
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -207,7 +207,7 @@ func (m *TimerTerminationCondition) validateProjectedExpiry(formats strfmt.Regis
 	return nil
 }
 
-func (m *TimerTerminationCondition) validateDurationInSeconds(formats strfmt.Registry) error {
+func (m *TimerTerminationCondition) validateDurationInSeconds(_ strfmt.Registry) error {
 
 	if err := validate.Required("durationInSeconds", "body", m.DurationInSeconds); err != nil {
 		return err
@@ -233,7 +233,7 @@ func (m *TimerTerminationCondition) validateExpiry(formats strfmt.Registry) erro
 	return nil
 }
 
-func (m *TimerTerminationCondition) validateRemainingTimeInSeconds(formats strfmt.Registry) error {
+func (m *TimerTerminationCondition) validateRemainingTimeInSeconds(_ strfmt.Registry) error {
 
 	if swag.IsZero(m.RemainingTimeInSeconds) { // not required
 		return nil
@@ -264,7 +264,7 @@ func (m *TimerTerminationCondition) ContextValidate(ctx context.Context, formats
 	return nil
 }
 
-func (m *TimerTerminationCondition) contextValidateProjectedExpiry(ctx context.Context, formats strfmt.Registry) error {
+func (m *TimerTerminationCondition) contextValidateProjectedExpiry(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "projectedExpiry", "body", strfmt.DateTime(m.ProjectedExpiry())); err != nil {
 		return err
@@ -285,7 +285,7 @@ func (m *TimerTerminationCondition) contextValidateType(ctx context.Context, for
 	return nil
 }
 
-func (m *TimerTerminationCondition) contextValidateExpiry(ctx context.Context, formats strfmt.Registry) error {
+func (m *TimerTerminationCondition) contextValidateExpiry(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "expiry", "body", strfmt.DateTime(m.Expiry)); err != nil {
 		return err

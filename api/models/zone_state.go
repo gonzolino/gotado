@@ -264,7 +264,7 @@ func (m *ZoneState) validateActivityDataPoints(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ZoneState) validateGeolocationOverride(formats strfmt.Registry) error {
+func (m *ZoneState) validateGeolocationOverride(_ strfmt.Registry) error {
 
 	if err := validate.Required("geolocationOverride", "body", m.GeolocationOverride); err != nil {
 		return err

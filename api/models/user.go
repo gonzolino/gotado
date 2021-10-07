@@ -68,7 +68,7 @@ func (m *User) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *User) validateEmail(formats strfmt.Registry) error {
+func (m *User) validateEmail(_ strfmt.Registry) error {
 
 	if err := validate.Required("email", "body", m.Email); err != nil {
 		return err
@@ -101,7 +101,7 @@ func (m *User) validateHomes(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *User) validateName(formats strfmt.Registry) error {
+func (m *User) validateName(_ strfmt.Registry) error {
 
 	if err := validate.Required("name", "body", m.Name); err != nil {
 		return err
@@ -110,7 +110,7 @@ func (m *User) validateName(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *User) validateUsername(formats strfmt.Registry) error {
+func (m *User) validateUsername(_ strfmt.Registry) error {
 
 	if err := validate.Required("username", "body", m.Username); err != nil {
 		return err
@@ -179,12 +179,12 @@ type UserHomesItems0 struct {
 }
 
 // Validate validates this user homes items0
-func (m *UserHomesItems0) Validate(formats strfmt.Registry) error {
+func (m *UserHomesItems0) Validate(_ strfmt.Registry) error {
 	return nil
 }
 
 // ContextValidate validates this user homes items0 based on context it is used
-func (m *UserHomesItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *UserHomesItems0) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

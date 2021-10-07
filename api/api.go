@@ -40,7 +40,7 @@ type API struct {
 }
 
 // NewAPI creates a new API client with the given ID and secret
-func NewAPI(ctx context.Context, clientID, clientSecret string) *API {
+func NewAPI(_ context.Context, clientID, clientSecret string) *API {
 	api := &API{
 		client:       client.Default,
 		clientID:     clientID,

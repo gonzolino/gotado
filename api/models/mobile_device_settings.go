@@ -38,7 +38,7 @@ func (m *MobileDeviceSettings) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *MobileDeviceSettings) validateGeoTrackingEnabled(formats strfmt.Registry) error {
+func (m *MobileDeviceSettings) validateGeoTrackingEnabled(_ strfmt.Registry) error {
 
 	if err := validate.Required("geoTrackingEnabled", "body", m.GeoTrackingEnabled); err != nil {
 		return err
@@ -48,7 +48,7 @@ func (m *MobileDeviceSettings) validateGeoTrackingEnabled(formats strfmt.Registr
 }
 
 // ContextValidate validates this mobile device settings based on context it is used
-func (m *MobileDeviceSettings) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *MobileDeviceSettings) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

@@ -44,7 +44,7 @@ func (m *genericZoneCapabilities) Type() TadoSystemType {
 }
 
 // SetType sets the type of this polymorphic type
-func (m *genericZoneCapabilities) SetType(val TadoSystemType) {
+func (m *genericZoneCapabilities) SetType(_ TadoSystemType) {
 }
 
 // UnmarshalGenericZoneCapabilitiesSlice unmarshals polymorphic slices of GenericZoneCapabilities
@@ -122,7 +122,7 @@ func unmarshalGenericZoneCapabilities(data []byte, consumer runtime.Consumer) (G
 }
 
 // Validate validates this generic zone capabilities
-func (m *genericZoneCapabilities) Validate(formats strfmt.Registry) error {
+func (m *genericZoneCapabilities) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	if len(res) > 0 {

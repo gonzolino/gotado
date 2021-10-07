@@ -54,7 +54,7 @@ func (m *OpenWindow) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OpenWindow) validateDurationInSeconds(formats strfmt.Registry) error {
+func (m *OpenWindow) validateDurationInSeconds(_ strfmt.Registry) error {
 	if swag.IsZero(m.DurationInSeconds) { // not required
 		return nil
 	}
@@ -78,7 +78,7 @@ func (m *OpenWindow) validateExpiry(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *OpenWindow) validateRemainingTimeInSeconds(formats strfmt.Registry) error {
+func (m *OpenWindow) validateRemainingTimeInSeconds(_ strfmt.Registry) error {
 	if swag.IsZero(m.RemainingTimeInSeconds) { // not required
 		return nil
 	}
@@ -91,7 +91,7 @@ func (m *OpenWindow) validateRemainingTimeInSeconds(formats strfmt.Registry) err
 }
 
 // ContextValidate validates this open window based on context it is used
-func (m *OpenWindow) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *OpenWindow) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

@@ -87,7 +87,7 @@ func (m *Zone) validateDevices(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Zone) validateID(formats strfmt.Registry) error {
+func (m *Zone) validateID(_ strfmt.Registry) error {
 
 	if err := validate.Required("id", "body", int32(m.ID)); err != nil {
 		return err
@@ -96,7 +96,7 @@ func (m *Zone) validateID(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Zone) validateName(formats strfmt.Registry) error {
+func (m *Zone) validateName(_ strfmt.Registry) error {
 
 	if err := validate.Required("name", "body", m.Name); err != nil {
 		return err
@@ -161,7 +161,7 @@ func (m *Zone) contextValidateDevices(ctx context.Context, formats strfmt.Regist
 	return nil
 }
 
-func (m *Zone) contextValidateID(ctx context.Context, formats strfmt.Registry) error {
+func (m *Zone) contextValidateID(ctx context.Context, _ strfmt.Registry) error {
 
 	if err := validate.ReadOnly(ctx, "id", "body", int32(m.ID)); err != nil {
 		return err

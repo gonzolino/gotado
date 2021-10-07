@@ -46,7 +46,7 @@ func (m *MobileDeviceLocation) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *MobileDeviceLocation) validateAtHome(formats strfmt.Registry) error {
+func (m *MobileDeviceLocation) validateAtHome(_ strfmt.Registry) error {
 
 	if err := validate.Required("atHome", "body", m.AtHome); err != nil {
 		return err
@@ -55,7 +55,7 @@ func (m *MobileDeviceLocation) validateAtHome(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *MobileDeviceLocation) validateStale(formats strfmt.Registry) error {
+func (m *MobileDeviceLocation) validateStale(_ strfmt.Registry) error {
 
 	if err := validate.Required("stale", "body", m.Stale); err != nil {
 		return err
@@ -65,7 +65,7 @@ func (m *MobileDeviceLocation) validateStale(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this mobile device location based on context it is used
-func (m *MobileDeviceLocation) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *MobileDeviceLocation) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

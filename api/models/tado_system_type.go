@@ -57,7 +57,7 @@ func (m TadoSystemType) validateTadoSystemTypeEnum(path, location string, value 
 }
 
 // Validate validates this tado system type
-func (m TadoSystemType) Validate(formats strfmt.Registry) error {
+func (m TadoSystemType) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	// value enum
@@ -72,7 +72,7 @@ func (m TadoSystemType) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validate this tado system type based on the context it is used
-func (m TadoSystemType) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m TadoSystemType) ContextValidate(ctx context.Context, _ strfmt.Registry) error {
 	var res []error
 
 	if err := validate.ReadOnly(ctx, "", "body", TadoSystemType(m)); err != nil {

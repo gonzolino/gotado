@@ -54,7 +54,7 @@ func (m PresenceState) validatePresenceStateEnum(path, location string, value Pr
 }
 
 // Validate validates this presence state
-func (m PresenceState) Validate(formats strfmt.Registry) error {
+func (m PresenceState) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	// value enum
@@ -69,6 +69,6 @@ func (m PresenceState) Validate(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this presence state based on context it is used
-func (m PresenceState) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m PresenceState) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }

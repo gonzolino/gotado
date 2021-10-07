@@ -72,7 +72,7 @@ func (o *ShowZoneCapabilitiesOK) GetPayload() models.GenericZoneCapabilities {
 	return o.Payload
 }
 
-func (o *ShowZoneCapabilitiesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneCapabilitiesOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	// response payload as interface type
 	payload, err := models.UnmarshalGenericZoneCapabilities(response.Body(), consumer)
@@ -104,7 +104,7 @@ func (o *ShowZoneCapabilitiesUnauthorized) GetPayload() *models.ClientErrorModel
 	return o.Payload
 }
 
-func (o *ShowZoneCapabilitiesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneCapabilitiesUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -136,7 +136,7 @@ func (o *ShowZoneCapabilitiesForbidden) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ShowZoneCapabilitiesForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneCapabilitiesForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -168,7 +168,7 @@ func (o *ShowZoneCapabilitiesNotFound) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ShowZoneCapabilitiesNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneCapabilitiesNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 

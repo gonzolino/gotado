@@ -33,7 +33,7 @@ func (m *TimerTerminationConditionTemplate) Type() OverlayTerminationConditionTy
 }
 
 // SetType sets the type of this subtype
-func (m *TimerTerminationConditionTemplate) SetType(val OverlayTerminationConditionType) {
+func (m *TimerTerminationConditionTemplate) SetType(_ OverlayTerminationConditionType) {
 }
 
 // UnmarshalJSON unmarshals this object with a polymorphic type from a JSON structure
@@ -124,7 +124,7 @@ func (m *TimerTerminationConditionTemplate) Validate(formats strfmt.Registry) er
 	return nil
 }
 
-func (m *TimerTerminationConditionTemplate) validateDurationInSeconds(formats strfmt.Registry) error {
+func (m *TimerTerminationConditionTemplate) validateDurationInSeconds(_ strfmt.Registry) error {
 
 	if err := validate.Required("durationInSeconds", "body", m.DurationInSeconds); err != nil {
 		return err
@@ -138,7 +138,7 @@ func (m *TimerTerminationConditionTemplate) validateDurationInSeconds(formats st
 }
 
 // ContextValidate validate this timer termination condition template based on the context it is used
-func (m *TimerTerminationConditionTemplate) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *TimerTerminationConditionTemplate) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	var res []error
 
 	if len(res) > 0 {

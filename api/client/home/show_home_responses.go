@@ -72,7 +72,7 @@ func (o *ShowHomeOK) GetPayload() *models.HomeInfo {
 	return o.Payload
 }
 
-func (o *ShowHomeOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowHomeOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.HomeInfo)
 
@@ -104,7 +104,7 @@ func (o *ShowHomeUnauthorized) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ShowHomeUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowHomeUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -136,7 +136,7 @@ func (o *ShowHomeForbidden) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ShowHomeForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowHomeForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -168,7 +168,7 @@ func (o *ShowHomeNotFound) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ShowHomeNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowHomeNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 

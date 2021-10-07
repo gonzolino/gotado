@@ -72,7 +72,7 @@ func (o *ShowZoneDefaultOverlayOK) GetPayload() *models.OverlayTemplate {
 	return o.Payload
 }
 
-func (o *ShowZoneDefaultOverlayOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneDefaultOverlayOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.OverlayTemplate)
 
@@ -104,7 +104,7 @@ func (o *ShowZoneDefaultOverlayUnauthorized) GetPayload() *models.ClientErrorMod
 	return o.Payload
 }
 
-func (o *ShowZoneDefaultOverlayUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneDefaultOverlayUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -136,7 +136,7 @@ func (o *ShowZoneDefaultOverlayForbidden) GetPayload() *models.ClientErrorModel 
 	return o.Payload
 }
 
-func (o *ShowZoneDefaultOverlayForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneDefaultOverlayForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 
@@ -168,7 +168,7 @@ func (o *ShowZoneDefaultOverlayNotFound) GetPayload() *models.ClientErrorModel {
 	return o.Payload
 }
 
-func (o *ShowZoneDefaultOverlayNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+func (o *ShowZoneDefaultOverlayNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, _ strfmt.Registry) error {
 
 	o.Payload = new(models.ClientErrorModel)
 

@@ -44,7 +44,7 @@ func (m *overlayTerminationConditionTemplate) Type() OverlayTerminationCondition
 }
 
 // SetType sets the type of this polymorphic type
-func (m *overlayTerminationConditionTemplate) SetType(val OverlayTerminationConditionType) {
+func (m *overlayTerminationConditionTemplate) SetType(_ OverlayTerminationConditionType) {
 }
 
 // UnmarshalOverlayTerminationConditionTemplateSlice unmarshals polymorphic slices of OverlayTerminationConditionTemplate
@@ -110,7 +110,7 @@ func unmarshalOverlayTerminationConditionTemplate(data []byte, consumer runtime.
 }
 
 // Validate validates this overlay termination condition template
-func (m *overlayTerminationConditionTemplate) Validate(formats strfmt.Registry) error {
+func (m *overlayTerminationConditionTemplate) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	if len(res) > 0 {

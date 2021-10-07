@@ -60,7 +60,7 @@ func (m *AcPowerDataPoint) validateTimestamp(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *AcPowerDataPoint) validateValue(formats strfmt.Registry) error {
+func (m *AcPowerDataPoint) validateValue(_ strfmt.Registry) error {
 
 	if err := validate.Required("value", "body", m.Value); err != nil {
 		return err
@@ -70,7 +70,7 @@ func (m *AcPowerDataPoint) validateValue(formats strfmt.Registry) error {
 }
 
 // ContextValidate validates this ac power data point based on context it is used
-func (m *AcPowerDataPoint) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *AcPowerDataPoint) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
 

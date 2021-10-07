@@ -61,7 +61,7 @@ func (m OverlayTerminationConditionType) validateOverlayTerminationConditionType
 }
 
 // Validate validates this overlay termination condition type
-func (m OverlayTerminationConditionType) Validate(formats strfmt.Registry) error {
+func (m OverlayTerminationConditionType) Validate(_ strfmt.Registry) error {
 	var res []error
 
 	// value enum
@@ -76,6 +76,6 @@ func (m OverlayTerminationConditionType) Validate(formats strfmt.Registry) error
 }
 
 // ContextValidate validates this overlay termination condition type based on context it is used
-func (m OverlayTerminationConditionType) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m OverlayTerminationConditionType) ContextValidate(_ context.Context, _ strfmt.Registry) error {
 	return nil
 }
