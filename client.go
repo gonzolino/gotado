@@ -2,6 +2,7 @@ package gotado
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -76,4 +77,23 @@ func (c *Client) Request(method, url string, body io.Reader) (*http.Response, er
 		return nil, fmt.Errorf("unable to create http request: %w", err)
 	}
 	return c.Do(req)
+}
+
+// get retrieves an object from the tado° API.
+func (c *Client) get(url string, v interface{}) error {
+	resp, err := c.Request(http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
+		return fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
+
+	return nil
 }

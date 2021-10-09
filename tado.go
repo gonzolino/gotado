@@ -433,122 +433,56 @@ type MobileDeviceMetadata struct {
 
 // GetMe returns information about the authenticated user.
 func GetMe(client *Client) (*User, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("me"), nil)
-	if err != nil {
+	me := &User{}
+	if err := client.get(apiURL("me"), me); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	me := &User{}
-	if err := json.NewDecoder(resp.Body).Decode(me); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return me, nil
 }
 
 // GetHome returns information about the given home
 func GetHome(client *Client, userHome *UserHome) (*Home, error) {
+	home := &Home{}
 	homeID := strconv.Itoa(int(userHome.ID))
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%s", homeID), nil)
-	if err != nil {
+	if err := client.get(apiURL("homes/%s", homeID), home); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	home := &Home{}
-	if err := json.NewDecoder(resp.Body).Decode(home); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return home, nil
 }
 
 // GetHomeState returns the state of the given home
 func GetHomeState(client *Client, userHome *UserHome) (*HomeState, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/state", userHome.ID), nil)
-	if err != nil {
+	homeState := &HomeState{}
+	if err := client.get(apiURL("homes/%d/state", userHome.ID), homeState); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	homeState := &HomeState{}
-	if err := json.NewDecoder(resp.Body).Decode(homeState); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return homeState, nil
 }
 
 // GetZones returns information about the zones in the given home
 func GetZones(client *Client, userHome *UserHome) ([]*Zone, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones", userHome.ID), nil)
-	if err != nil {
+	zones := make([]*Zone, 0)
+	if err := client.get(apiURL("homes/%d/zones", userHome.ID), &zones); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	zones := make([]*Zone, 0)
-	if err := json.NewDecoder(resp.Body).Decode(&zones); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return zones, nil
 }
 
 // GetZoneState returns the state of the given zone
 func GetZoneState(client *Client, userHome *UserHome, zone *Zone) (*ZoneState, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/state", userHome.ID, zone.ID), nil)
-	if err != nil {
+	zoneState := &ZoneState{}
+	if err := client.get(apiURL("homes/%d/zones/%d/state", userHome.ID, zone.ID), zoneState); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	zoneState := &ZoneState{}
-	if err := json.NewDecoder(resp.Body).Decode(&zoneState); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return zoneState, nil
 }
 
 // GetZoneCapabilities returns the capabilities of the given zone
 func GetZoneCapabilities(client *Client, userHome *UserHome, zone *Zone) (*ZoneCapabilities, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/capabilities", userHome.ID, zone.ID), nil)
-	if err != nil {
+	zoneCapabilities := &ZoneCapabilities{}
+	if err := client.get(apiURL("homes/%d/zones/%d/capabilities", userHome.ID, zone.ID), zoneCapabilities); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	zoneCapabilities := &ZoneCapabilities{}
-	if err := json.NewDecoder(resp.Body).Decode(&zoneCapabilities); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return zoneCapabilities, nil
 }
 
@@ -677,39 +611,19 @@ func SetWindowClosed(client *Client, userHome *UserHome, zone *Zone) error {
 
 // GetTimetables lists available schedule timetables for the given zone
 func GetTimetables(client *Client, userHome *UserHome, zone *Zone) ([]*ScheduleTimetable, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/schedule/timetables", userHome.ID, zone.ID), nil)
-	if err != nil {
+	timetables := make([]*ScheduleTimetable, 0)
+	if err := client.get(apiURL("homes/%d/zones/%d/schedule/timetables", userHome.ID, zone.ID), &timetables); err != nil {
 		return nil, err
 	}
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	timetables := make([]*ScheduleTimetable, 0)
-	if err := json.NewDecoder(resp.Body).Decode(&timetables); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return timetables, nil
 }
 
 // GetActiveTimetable returns the active schedule timetable for the given zone
 func GetActiveTimetable(client *Client, userHome *UserHome, zone *Zone) (*ScheduleTimetable, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/schedule/activeTimetable", userHome.ID, zone.ID), nil)
-	if err != nil {
+	timetable := &ScheduleTimetable{}
+	if err := client.get(apiURL("homes/%d/zones/%d/schedule/activeTimetable", userHome.ID, zone.ID), timetable); err != nil {
 		return nil, err
 	}
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	timetable := &ScheduleTimetable{}
-	if err := json.NewDecoder(resp.Body).Decode(&timetable); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return timetable, nil
 }
 
@@ -744,20 +658,10 @@ func SetActiveTimetable(client *Client, userHome *UserHome, zone *Zone, timetabl
 
 // GetSchedule returns the heating schedule of the given zone
 func GetSchedule(client *Client, userHome *UserHome, zone *Zone, timetable *ScheduleTimetable) ([]*ScheduleBlock, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/schedule/timetables/%d/blocks", userHome.ID, zone.ID, timetable.ID), nil)
-	if err != nil {
+	scheduleBlocks := make([]*ScheduleBlock, 0)
+	if err := client.get(apiURL("homes/%d/zones/%d/schedule/timetables/%d/blocks", userHome.ID, zone.ID, timetable.ID), &scheduleBlocks); err != nil {
 		return nil, err
 	}
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	scheduleBlocks := make([]*ScheduleBlock, 0)
-	if err := json.NewDecoder(resp.Body).Decode(&scheduleBlocks); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return scheduleBlocks, nil
 }
 
@@ -798,20 +702,10 @@ func SetSchedule(client *Client, userHome *UserHome, zone *Zone, timetable *Sche
 
 // GetAwayConfiguration returns the away configuration of the given zone
 func GetAwayConfiguration(client *Client, userHome *UserHome, zone *Zone) (*AwayConfiguration, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/schedule/awayConfiguration", userHome.ID, zone.ID), nil)
-	if err != nil {
+	awayConfig := &AwayConfiguration{}
+	if err := client.get(apiURL("homes/%d/zones/%d/schedule/awayConfiguration", userHome.ID, zone.ID), awayConfig); err != nil {
 		return nil, err
 	}
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	awayConfig := &AwayConfiguration{}
-	if err := json.NewDecoder(resp.Body).Decode(&awayConfig); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return awayConfig, nil
 }
 
@@ -932,20 +826,10 @@ func SetPresenceAuto(client *Client, userHome *UserHome) error {
 
 // IsEarlyStartEnabled returns if the given zone has turned on early start
 func IsEarlyStartEnabled(client *Client, userHome *UserHome, zone *Zone) (bool, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/zones/%d/earlyStart", userHome.ID, zone.ID), nil)
-	if err != nil {
+	earlyStart := &EarlyStart{}
+	if err := client.get(apiURL("homes/%d/zones/%d/earlyStart", userHome.ID, zone.ID), earlyStart); err != nil {
 		return false, err
 	}
-
-	if err := isError(resp); err != nil {
-		return false, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	earlyStart := &EarlyStart{}
-	if err := json.NewDecoder(resp.Body).Decode(&earlyStart); err != nil {
-		return false, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return earlyStart.Enabled, nil
 }
 
@@ -990,81 +874,37 @@ func DisableEarlyStart(client *Client, userHome *UserHome, zone *Zone) error {
 
 // GetWeather returns weather information at the given homes location
 func GetWeather(client *Client, userHome *UserHome) (*Weather, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/weather", userHome.ID), nil)
-	if err != nil {
+	weather := &Weather{}
+	if err := client.get(apiURL("homes/%d/weather", userHome.ID), weather); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	weather := &Weather{}
-	if err := json.NewDecoder(resp.Body).Decode(&weather); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return weather, nil
 }
 
 // GetDevices lists all devices in the given home
 func GetDevices(client *Client, userHome *UserHome) ([]*Device, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/devices", userHome.ID), nil)
-	if err != nil {
+	devices := make([]*Device, 0)
+	if err := client.get(apiURL("homes/%d/devices", userHome.ID), &devices); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	devices := []*Device{}
-	if err := json.NewDecoder(resp.Body).Decode(&devices); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return devices, nil
 }
 
 // GetInstallations lists all installations in the given home
 func GetInstallations(client *Client, userHome *UserHome) ([]*Installation, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/installations", userHome.ID), nil)
-	if err != nil {
+	installations := make([]*Installation, 0)
+	if err := client.get(apiURL("homes/%d/installations", userHome.ID), &installations); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	installations := []*Installation{}
-	if err := json.NewDecoder(resp.Body).Decode(&installations); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return installations, nil
 }
 
 // GetMobileDevices lists all mobile devices linked to the given home
 func GetMobileDevices(client *Client, userHome *UserHome) ([]*MobileDevice, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/mobileDevices", userHome.ID), nil)
-	if err != nil {
+	mobileDevices := make([]*MobileDevice, 0)
+	if err := client.get(apiURL("homes/%d/mobileDevices", userHome.ID), &mobileDevices); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	mobileDevices := []*MobileDevice{}
-	if err := json.NewDecoder(resp.Body).Decode(&mobileDevices); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return mobileDevices, nil
 }
 
@@ -1106,20 +946,9 @@ func SetMobileDeviceSettings(client *Client, userHome *UserHome, mobileDevice *M
 
 // GetUsers lists all users and their mobile devices linked to the given home
 func GetUsers(client *Client, userHome *UserHome) ([]*User, error) {
-	resp, err := client.Request(http.MethodGet, apiURL("homes/%d/users", userHome.ID), nil)
-	if err != nil {
+	users := make([]*User, 0)
+	if err := client.get(apiURL("homes/%d/users", userHome.ID), &users); err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	users := []*User{}
-	if err := json.NewDecoder(resp.Body).Decode(&users); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
 	return users, nil
 }
