@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	oauth2int "github.com/gonzolino/gotado/internal/oauth2"
 	"golang.org/x/oauth2"
@@ -16,6 +15,10 @@ const (
 	tokenURL = "https://auth.tado.com/oauth/token"
 )
 
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // Client to access the tado° API
 type Client struct {
 	// ClientID specifies the client ID to use for authentication
@@ -23,7 +26,7 @@ type Client struct {
 	// ClientSecret specifies the client secret to use for authentication
 	ClientSecret string
 
-	http *http.Client
+	http HTTPClient
 }
 
 // NewClient creates a new tado° client
@@ -35,9 +38,9 @@ func NewClient(clientID, clientSecret string) *Client {
 	}
 }
 
-// WithTimeout configures the tado° object with the given timeout for HTTP requests.
-func (c *Client) WithTimeout(timeout time.Duration) *Client {
-	c.http.Timeout = timeout
+// WithHTTPClient configures the http client to use for tado° API interactions
+func (c *Client) WithHTTPClient(httpClient *http.Client) *Client {
+	c.http = httpClient
 	return c
 }
 

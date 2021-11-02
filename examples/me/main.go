@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -30,7 +31,8 @@ func main() {
 	ctx := context.Background()
 
 	// Create authenticated tado° client
-	client := gotado.NewClient(clientID, clientSecret).WithTimeout(5 * time.Second)
+	httpClient := &http.Client{Timeout: 5 * time.Second}
+	client := gotado.NewClient(clientID, clientSecret).WithHTTPClient(httpClient)
 	client, err := client.WithCredentials(ctx, username, password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Authentication failed: %v\n", err)
