@@ -1,11 +1,13 @@
 package gotado
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 
 	oauth2int "github.com/gonzolino/gotado/internal/oauth2"
 	"golang.org/x/oauth2"
@@ -79,6 +81,18 @@ func (c *Client) Request(method, url string, body io.Reader) (*http.Response, er
 	return c.Do(req)
 }
 
+// RequestWithHeaders performs an HTTP request to the tado° API with the given map of HTTP headers
+func (c *Client) RequestWithHeaders(method, url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create http request: %w", err)
+	}
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+	return c.Do(req)
+}
+
 // get retrieves an object from the tado° API.
 func (c *Client) get(url string, v interface{}) error {
 	resp, err := c.Request(http.MethodGet, url, nil)
@@ -95,5 +109,36 @@ func (c *Client) get(url string, v interface{}) error {
 		return fmt.Errorf("unable to decode tado° API response: %w", err)
 	}
 
+	return nil
+}
+
+// put updates an object on the tado° API.
+// If the update is successful and v is a pointer, put will decode the response
+// body into the value pointed to by v. If v is not a pointer the response body
+// will be ignored.
+func (c *Client) put(url string, v interface{}) error {
+	data, err := json.Marshal(v)
+	if err != nil {
+		return fmt.Errorf("unable to marshal object: %w", err)
+	}
+	resp, err := c.RequestWithHeaders(http.MethodPut, url, bytes.NewReader(data),
+		map[string]string{"Content-Type": "application/json;charset=utf-8"})
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	// If v is not a pointer, ignore the response body
+	if rv := reflect.ValueOf(v); rv.Kind() != reflect.Ptr {
+		return nil
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
+		return fmt.Errorf("unable to decode tado° API response: %w", err)
+	}
 	return nil
 }

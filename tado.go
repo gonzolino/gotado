@@ -1,8 +1,6 @@
 package gotado
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -487,43 +485,19 @@ func GetZoneCapabilities(client *Client, userHome *UserHome, zone *Zone) (*ZoneC
 }
 
 // setZoneOverlay sets a zone overlay setting
-func setZoneOverlay(client *Client, userHome *UserHome, zone *Zone, overlay ZoneOverlay) (*ZoneOverlay, error) {
-	data, err := json.Marshal(overlay)
-	if err != nil {
-		return nil, fmt.Errorf("unable to marshal zone overlay: %w", err)
-	}
-	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/zones/%d/overlay", userHome.ID, zone.ID), bytes.NewReader(data))
-	if err != nil {
-		return nil, fmt.Errorf("unable to create http request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := isError(resp); err != nil {
-		return nil, fmt.Errorf("tado° API error: %w", err)
-	}
-
-	respOverlay := &ZoneOverlay{}
-	if err := json.NewDecoder(resp.Body).Decode(&respOverlay); err != nil {
-		return nil, fmt.Errorf("unable to decode tado° API response: %w", err)
-	}
-
-	return respOverlay, nil
+func setZoneOverlay(client *Client, userHome *UserHome, zone *Zone, overlay *ZoneOverlay) error {
+	return client.put(apiURL("homes/%d/zones/%d/overlay", userHome.ID, zone.ID), overlay)
 }
 
 // SetZoneOverlayHeatingOff turns off heating in a zone
 func SetZoneOverlayHeatingOff(client *Client, userHome *UserHome, zone *Zone) error {
-	setOverlay := ZoneOverlay{
+	overlay := &ZoneOverlay{
 		Setting: ZoneOverlaySetting{
 			Type:  "HEATING",
 			Power: "OFF",
 		},
 	}
-	overlay, err := setZoneOverlay(client, userHome, zone, setOverlay)
-	if err != nil {
+	if err := setZoneOverlay(client, userHome, zone, overlay); err != nil {
 		return err
 	}
 
@@ -551,15 +525,14 @@ func SetZoneOverlayHeatingOn(client *Client, userHome *UserHome, zone *Zone, tem
 		return nil, fmt.Errorf("invalid temperature unit '%s'", home.TemperatureUnit)
 	}
 
-	setOverlay := ZoneOverlay{
+	overlay := &ZoneOverlay{
 		Setting: ZoneOverlaySetting{
 			Type:        "HEATING",
 			Power:       "ON",
 			Temperature: temperatureSetting,
 		},
 	}
-	overlay, err := setZoneOverlay(client, userHome, zone, setOverlay)
-	if err != nil {
+	if err := setZoneOverlay(client, userHome, zone, overlay); err != nil {
 		return nil, err
 	}
 
@@ -629,28 +602,10 @@ func GetActiveTimetable(client *Client, userHome *UserHome, zone *Zone) (*Schedu
 
 // SetActiveTimetable sets the active schedule timetable for the given zone
 func SetActiveTimetable(client *Client, userHome *UserHome, zone *Zone, timetable *ScheduleTimetable) error {
-	newTimetable := ScheduleTimetable{ID: timetable.ID}
-	data, err := json.Marshal(newTimetable)
-	if err != nil {
-		return fmt.Errorf("unable to marshal timetable: %w", err)
-	}
-	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/zones/%d/schedule/activeTimetable", userHome.ID, zone.ID), bytes.NewReader(data))
-	if err != nil {
-		return fmt.Errorf("unable to create http request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-	resp, err := client.Do(req)
-	if err != nil {
+	newTimetable := &ScheduleTimetable{ID: timetable.ID}
+
+	if err := client.put(apiURL("homes/%d/zones/%d/schedule/activeTimetable", userHome.ID, zone.ID), newTimetable); err != nil {
 		return err
-	}
-
-	if err := isError(resp); err != nil {
-		return fmt.Errorf("tado° API error: %w", err)
-	}
-
-	respTimetable := &ScheduleTimetable{}
-	if err := json.NewDecoder(resp.Body).Decode(&respTimetable); err != nil {
-		return fmt.Errorf("unable to decode tado° API response: %w", err)
 	}
 
 	return nil
@@ -678,22 +633,8 @@ func SetSchedule(client *Client, userHome *UserHome, zone *Zone, timetable *Sche
 	}
 
 	for dayType, scheduleBlocks := range scheduleMap {
-		data, err := json.Marshal(scheduleBlocks)
-		if err != nil {
-			return fmt.Errorf("unable to marshal schedule: %w", err)
-		}
-		req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/zones/%d/schedule/timetables/%d/blocks/%s", userHome.ID, zone.ID, timetable.ID, dayType), bytes.NewReader(data))
-		if err != nil {
-			return fmt.Errorf("unable to create http request: %w", err)
-		}
-		req.Header.Set("Content-Type", "application/json;charset=utf-8")
-		resp, err := client.Do(req)
-		if err != nil {
+		if err := client.put(apiURL("homes/%d/zones/%d/schedule/timetables/%d/blocks/%s", userHome.ID, zone.ID, timetable.ID, dayType), scheduleBlocks); err != nil {
 			return err
-		}
-
-		if err := isError(resp); err != nil {
-			return fmt.Errorf("tado° API error: %w", err)
 		}
 	}
 
@@ -711,25 +652,7 @@ func GetAwayConfiguration(client *Client, userHome *UserHome, zone *Zone) (*Away
 
 // SetAwayConfiguration sets an away configuration for the given zone
 func SetAwayConfiguration(client *Client, userHome *UserHome, zone *Zone, awayConfig *AwayConfiguration) error {
-	data, err := json.Marshal(awayConfig)
-	if err != nil {
-		return fmt.Errorf("unable to marshal away configuration: %w", err)
-	}
-	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/zones/%d/schedule/awayConfiguration", userHome.ID, zone.ID), bytes.NewReader(data))
-	if err != nil {
-		return fmt.Errorf("unable to create http request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-
-	if err := isError(resp); err != nil {
-		return fmt.Errorf("tado° API error: %w", err)
-	}
-
-	return nil
+	return client.put(apiURL("homes/%d/zones/%d/schedule/awayConfiguration", userHome.ID, zone.ID), *awayConfig)
 }
 
 // SetAwayTemperature sets the manual temperature for a zone when everybody leaves the house
@@ -774,25 +697,7 @@ func SetAwayComfortLevel(client *Client, userHome *UserHome, zone *Zone, comfort
 
 // setPresenceLock sets a locked presence on the given home (HOME or AWAY)
 func setPresenceLock(client *Client, userHome *UserHome, presence PresenceLock) error {
-	data, err := json.Marshal(presence)
-	if err != nil {
-		return fmt.Errorf("unable to marshal presence lock: %w", err)
-	}
-	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/presenceLock", userHome.ID), bytes.NewReader(data))
-	if err != nil {
-		return fmt.Errorf("unable to create http request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-
-	if err := isError(resp); err != nil {
-		return fmt.Errorf("tado° API error: %w", err)
-	}
-
-	return nil
+	return client.put(apiURL("homes/%d/presenceLock", userHome.ID), presence)
 }
 
 // SetPresenceHome sets the geofencing presence to 'at home'
@@ -834,42 +739,18 @@ func IsEarlyStartEnabled(client *Client, userHome *UserHome, zone *Zone) (bool, 
 }
 
 // setEarlyStart sets the early start setting for the given zone
-func setEarlyStart(client *Client, userHome *UserHome, zone *Zone, earlyStart EarlyStart) error {
-	data, err := json.Marshal(earlyStart)
-	if err != nil {
-		return fmt.Errorf("unable to marshal early start: %w", err)
-	}
-	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/zones/%d/earlyStart", userHome.ID, zone.ID), bytes.NewReader(data))
-	if err != nil {
-		return fmt.Errorf("unable to create http request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-
-	if err := isError(resp); err != nil {
-		return fmt.Errorf("tado° API error: %w", err)
-	}
-
-	return nil
+func setEarlyStart(client *Client, userHome *UserHome, zone *Zone, earlyStart *EarlyStart) error {
+	return client.put(apiURL("homes/%d/zones/%d/earlyStart", userHome.ID, zone.ID), earlyStart)
 }
 
 // EnableEarlyStart enables early start in the given zone
 func EnableEarlyStart(client *Client, userHome *UserHome, zone *Zone) error {
-	earlyStart := EarlyStart{
-		Enabled: true,
-	}
-	return setEarlyStart(client, userHome, zone, earlyStart)
+	return setEarlyStart(client, userHome, zone, &EarlyStart{Enabled: true})
 }
 
 // DisableEarlyStart disables early start in the given zone
 func DisableEarlyStart(client *Client, userHome *UserHome, zone *Zone) error {
-	earlyStart := EarlyStart{
-		Enabled: false,
-	}
-	return setEarlyStart(client, userHome, zone, earlyStart)
+	return setEarlyStart(client, userHome, zone, &EarlyStart{Enabled: false})
 }
 
 // GetWeather returns weather information at the given homes location
@@ -922,26 +803,8 @@ func DeleteMobileDevice(client *Client, userHome *UserHome, mobileDevice *Mobile
 }
 
 // SetMobileDeviceSettings updates the given mobile device with the given settings
-func SetMobileDeviceSettings(client *Client, userHome *UserHome, mobileDevice *MobileDevice, settings MobileDeviceSettings) error {
-	data, err := json.Marshal(settings)
-	if err != nil {
-		return fmt.Errorf("unable to marshal mobile device settings: %w", err)
-	}
-	req, err := http.NewRequest(http.MethodPut, apiURL("homes/%d/mobileDevices/%d/settings", userHome.ID, mobileDevice.ID), bytes.NewReader(data))
-	if err != nil {
-		return fmt.Errorf("unable to create http request: %w", err)
-	}
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-
-	if err := isError(resp); err != nil {
-		return fmt.Errorf("tado° API error: %w", err)
-	}
-
-	return nil
+func SetMobileDeviceSettings(client *Client, userHome *UserHome, mobileDevice *MobileDevice, settings *MobileDeviceSettings) error {
+	return client.put(apiURL("homes/%d/mobileDevices/%d/settings", userHome.ID, mobileDevice.ID), settings)
 }
 
 // GetUsers lists all users and their mobile devices linked to the given home
