@@ -545,15 +545,7 @@ func SetZoneOverlayHeatingOn(client *Client, userHome *UserHome, zone *Zone, tem
 
 // DeleteZoneOverlay removes an overlay from a zone, thereby returning a zone to smart schedule
 func DeleteZoneOverlay(client *Client, userHome *UserHome, zone *Zone) error {
-	resp, err := client.Request(http.MethodDelete, apiURL("homes/%d/zones/%d/overlay", userHome.ID, zone.ID), nil)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
-	}
-	return nil
+	return client.delete(apiURL("homes/%d/zones/%d/overlay", userHome.ID, zone.ID))
 }
 
 // SetWindowOpen marks the window in a zone as open (open window must have been detected before)
@@ -571,15 +563,7 @@ func SetWindowOpen(client *Client, userHome *UserHome, zone *Zone) error {
 
 // SetWindowClosed marks the window in a zone as closed
 func SetWindowClosed(client *Client, userHome *UserHome, zone *Zone) error {
-	resp, err := client.Request(http.MethodDelete, apiURL("homes/%d/zones/%d/state/openWindow", userHome.ID, zone.ID), nil)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
-	}
-	return nil
+	return client.delete(apiURL("homes/%d/zones/%d/state/openWindow", userHome.ID, zone.ID))
 }
 
 // GetTimetables lists available schedule timetables for the given zone
@@ -718,15 +702,7 @@ func SetPresenceAway(client *Client, userHome *UserHome) error {
 
 // SetPresenceAuto removes a locked geofencing presence and returns to auto mode
 func SetPresenceAuto(client *Client, userHome *UserHome) error {
-	resp, err := client.Request(http.MethodDelete, apiURL("homes/%d/presenceLock", userHome.ID), nil)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
-	}
-	return nil
+	return client.delete(apiURL("homes/%d/presenceLock", userHome.ID))
 }
 
 // IsEarlyStartEnabled returns if the given zone has turned on early start
@@ -791,15 +767,7 @@ func GetMobileDevices(client *Client, userHome *UserHome) ([]*MobileDevice, erro
 
 // DeleteMobileDevice deletes the given mobile device
 func DeleteMobileDevice(client *Client, userHome *UserHome, mobileDevice *MobileDevice) error {
-	resp, err := client.Request(http.MethodDelete, apiURL("homes/%d/mobileDevices/%d", userHome.ID, mobileDevice.ID), nil)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
-	}
-	return nil
+	return client.delete(apiURL("homes/%d/mobileDevices/%d", userHome.ID, mobileDevice.ID))
 }
 
 // SetMobileDeviceSettings updates the given mobile device with the given settings

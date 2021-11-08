@@ -62,6 +62,7 @@ func TestWithCredentials(t *testing.T) {
 func makeResponse(code int, body string) *http.Response {
 	return &http.Response{
 		StatusCode: code,
+		Status:     http.StatusText(code),
 		Body:       io.NopCloser(strings.NewReader(body)),
 	}
 }
@@ -282,6 +283,80 @@ func TestPut(t *testing.T) {
 				assert.NoError(t, err)
 				assert.Exactly(t, tc.wantFoobar, data)
 			}
+		})
+	}
+}
+
+func TestDelete(t *testing.T) {
+	tests := map[string]struct {
+		url      string
+		mockResp *http.Response
+		mockErr  error
+		wantErr  error
+	}{
+		"Simple": {
+			url:      "http://example.org",
+			mockResp: makeResponse(http.StatusNoContent, ""),
+			mockErr:  nil,
+			wantErr:  nil,
+		},
+		"UnexepctedResponseCode": {
+			url:      "http://example.org",
+			mockResp: makeResponse(http.StatusOK, `{"foo": "foo","bar": "bar"}`),
+			mockErr:  nil,
+			wantErr:  fmt.Errorf("unexpected tado° API response status: OK"),
+		},
+		"InvalidURL": {
+			url:      "invalid://url%%",
+			mockResp: nil,
+			mockErr:  nil,
+			wantErr:  fmt.Errorf("unable to create http request: parse \"invalid://url%%%%\": invalid URL escape \"%%%%\""),
+		},
+		"HTTPClientError": {
+			url:      "http://example.org",
+			mockResp: nil,
+			mockErr:  fmt.Errorf("http client error"),
+			wantErr:  fmt.Errorf("unable to talk to tado° API: http client error"),
+		},
+		"EmptyErrorList": {
+			url:      "http://example.org",
+			mockResp: makeResponse(http.StatusInternalServerError, `{"errors":[]}`),
+			mockErr:  nil,
+			wantErr:  fmt.Errorf("tado° API error: API returned empty error"),
+		},
+		"SingleError": {
+			url:      "http://example.org",
+			mockResp: makeResponse(http.StatusInternalServerError, `{"errors":[{"code":"1","title":"One"}]}`),
+			mockErr:  nil,
+			wantErr:  fmt.Errorf("tado° API error: 1: One"),
+		},
+		"MultiError": {
+			url:      "http://example.org",
+			mockResp: makeResponse(http.StatusInternalServerError, `{"errors":[{"code":"1","title":"One"},{"code":"2","title":"Two"}]}`),
+			mockErr:  nil,
+			wantErr:  fmt.Errorf("tado° API error: 1: One, 2: Two"),
+		},
+		"UnparseableError": {
+			url:      "http://example.org",
+			mockResp: makeResponse(http.StatusInternalServerError, `{errorjson}`),
+			mockErr:  nil,
+			wantErr:  fmt.Errorf("tado° API error: unable to decode API error: invalid character 'e' looking for beginning of object key string"),
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			client := NewClient("test", "test")
+			client.http = mockHTTPClient{Response: tc.mockResp, Error: tc.mockErr}
+
+			err := client.delete(tc.url)
+
+			if tc.wantErr != nil {
+				assert.EqualError(t, err, tc.wantErr.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+
 		})
 	}
 }

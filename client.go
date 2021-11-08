@@ -142,3 +142,20 @@ func (c *Client) put(url string, v interface{}) error {
 	}
 	return nil
 }
+
+// delete deletes an object from the tado° API.
+func (c *Client) delete(url string) error {
+	resp, err := c.Request(http.MethodDelete, url, nil)
+	if err != nil {
+		return err
+	}
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
+	}
+	return nil
+}
