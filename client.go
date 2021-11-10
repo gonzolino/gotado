@@ -112,6 +112,23 @@ func (c *Client) get(url string, v interface{}) error {
 	return nil
 }
 
+// post sends a post request to the tado° API.
+func (c *Client) post(url string) error {
+	resp, err := c.Request(http.MethodPost, url, nil)
+	if err != nil {
+		return err
+	}
+
+	if err := isError(resp); err != nil {
+		return fmt.Errorf("tado° API error: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
+	}
+	return nil
+}
+
 // put updates an object on the tado° API.
 // If the update is successful and v is a pointer, put will decode the response
 // body into the value pointed to by v. If v is not a pointer the response body

@@ -3,7 +3,6 @@ package gotado
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"strconv"
 )
 
@@ -550,15 +549,7 @@ func DeleteZoneOverlay(client *Client, userHome *UserHome, zone *Zone) error {
 
 // SetWindowOpen marks the window in a zone as open (open window must have been detected before)
 func SetWindowOpen(client *Client, userHome *UserHome, zone *Zone) error {
-	resp, err := client.Request(http.MethodPost, apiURL("homes/%d/zones/%d/state/openWindow/activate", userHome.ID, zone.ID), nil)
-	if err != nil {
-		return err
-	}
-
-	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("unexpected tado° API response status: %s", resp.Status)
-	}
-	return nil
+	return client.post(apiURL("homes/%d/zones/%d/state/openWindow/activate", userHome.ID, zone.ID))
 }
 
 // SetWindowClosed marks the window in a zone as closed
