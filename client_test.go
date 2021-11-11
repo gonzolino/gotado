@@ -23,7 +23,7 @@ type mockHTTPClient struct {
 }
 
 // Do returns the Response stored in the mockHTTPClient.
-func (c mockHTTPClient) Do(req *http.Request) (*http.Response, error) {
+func (c mockHTTPClient) Do(_ *http.Request) (*http.Response, error) {
 	return c.Response, c.Error
 }
 
