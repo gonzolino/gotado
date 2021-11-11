@@ -157,11 +157,7 @@ func GetActiveTimetable(client *Client, userHome *UserHome, zone *Zone) (*Schedu
 func SetActiveTimetable(client *Client, userHome *UserHome, zone *Zone, timetable *ScheduleTimetable) error {
 	newTimetable := &ScheduleTimetable{ID: timetable.ID}
 
-	if err := client.put(apiURL("homes/%d/zones/%d/schedule/activeTimetable", userHome.ID, zone.ID), newTimetable); err != nil {
-		return err
-	}
-
-	return nil
+	return client.put(apiURL("homes/%d/zones/%d/schedule/activeTimetable", userHome.ID, zone.ID), newTimetable)
 }
 
 // GetSchedule returns the heating schedule of the given zone
