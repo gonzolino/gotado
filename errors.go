@@ -2,6 +2,7 @@ package gotado
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -29,6 +30,9 @@ func (e *apiError) Error() string {
 }
 
 func isError(resp *http.Response) error {
+	if resp == nil {
+		return errors.New("response is nil")
+	}
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		return nil
 	}
