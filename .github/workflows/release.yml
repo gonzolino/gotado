@@ -13,5 +13,5 @@ jobs:
       - uses: GoogleCloudPlatform/release-please-action@v2.34
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          release-type: simple
+          release-type: go
           package-name: gotado
