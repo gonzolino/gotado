@@ -1,22 +1,5 @@
 # Changelog
 
-## [1.0.0](https://www.github.com/gonzolino/gotado/compare/v0.3.0...v1.0.0) (2021-11-11)
-
-
-### ⚠ BREAKING CHANGES
-
-* Give the tado client a central put method that all setter functions can rely on.
-* Client method `WithTimeout` removed.
-
-### Features
-
-* make http client in gotado configurable ([376ceb9](https://www.github.com/gonzolino/gotado/commit/376ceb94d8cd5e2f0f871f028aac92fc3c3db10a))
-
-
-### Code Refactoring
-
-* remove duplicated put code ([33aabe1](https://www.github.com/gonzolino/gotado/commit/33aabe14d08aaae16d2f9ebc690f9bf0d7093226))
-
 ## [0.3.0](https://www.github.com/gonzolino/gotado/compare/v0.2.0...v0.3.0) (2021-07-14)
 
 
