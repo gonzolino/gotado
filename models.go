@@ -19,12 +19,11 @@ type UserHome struct {
 
 // Home represents a home equipped with tado°
 type Home struct {
-	ID              int32  `json:"id"`
-	Name            string `json:"name"`
-	DateTimeZone    string `json:"dateTimeZone"`
-	DateCreated     string `json:"dateCreated"`
-	TemperatureUnit string `json:"temperatureUnit"`
-	// TODO: partner missing
+	ID                         int32                 `json:"id"`
+	Name                       string                `json:"name"`
+	DateTimeZone               string                `json:"dateTimeZone"`
+	DateCreated                string                `json:"dateCreated"`
+	TemperatureUnit            string                `json:"temperatureUnit"`
 	SimpleSmartScheduleEnabled bool                  `json:"simpleSmartScheduleEnabled"`
 	AwayRadiusInmeters         float32               `json:"awayRadiusInMeters"`
 	InstallationCompleted      bool                  `json:"installationCompleted"`
@@ -76,12 +75,12 @@ type HomeState struct {
 
 // Zone represents a tado° zone
 type Zone struct {
-	ID          int32    `json:"id"`
-	Name        string   `json:"name"`
-	Type        string   `json:"type"`
-	DateCreated string   `json:"dateCreated"`
-	DeviceTypes []string `json:"deviceTypes"`
-	// TODO: devices missing
+	ID                  int32                   `json:"id"`
+	Name                string                  `json:"name"`
+	Type                string                  `json:"type"`
+	DateCreated         string                  `json:"dateCreated"`
+	DeviceTypes         []string                `json:"deviceTypes"`
+	Devices             []Device                `json:"devices"`
 	ReportAvailable     bool                    `json:"reportAvailable"`
 	SupportsDazzle      bool                    `json:"supportsDazzle"`
 	DazzleEnabled       bool                    `json:"dazzleEnabled"`
@@ -126,26 +125,25 @@ type ZoneCapabilitiesTemperatureValues struct {
 
 // ZoneState represents the state of a tado° zone
 type ZoneState struct {
-	TadoMode            string `json:"tadoMode"`
-	GeolocationOverride bool   `json:"geolocationOverride"`
-	// TODO: missing geolocationOverrideDisableTime
-	// TODO: missing preparation
-	Setting     ZoneStateSetting     `json:"setting"`
-	OverlayType *string              `json:"overlayType"`
-	Overlay     *ZoneOverlay         `json:"overlay"`
-	OpenWindow  *ZoneStateOpenWindow `json:"openWindow"`
-	// TODO: missing nextScheduleChange
-	// TODO: missing nextTimeBlock
-	Link ZoneStateLink `json:"link"`
-	// TODO: missing activityDataPoints
-	SensorDataPoints *ZoneStateSensorDataPoints `json:"sensorDataPoints"`
+	TadoMode                       string                        `json:"tadoMode"`
+	GeolocationOverride            bool                          `json:"geolocationOverride"`
+	GeolocationOverrideDisableTime *string                       `json:"geolocationOverrideDisableTime"`
+	Setting                        ZoneStateSetting              `json:"setting"`
+	OverlayType                    *string                       `json:"overlayType"`
+	Overlay                        *ZoneOverlay                  `json:"overlay"`
+	OpenWindow                     *ZoneStateOpenWindow          `json:"openWindow"`
+	NextScheduledChange            *ZoneStateNextScheduledChange `json:"nextScheduleChange"`
+	NextTimeBlock                  *ZoneStateNextTimeBlock       `json:"nextTimeBlock"`
+	Link                           ZoneStateLink                 `json:"link"`
+	ActivityDataPoints             *ZoneStateActivityDataPoints  `json:"activityDataPoints"`
+	SensorDataPoints               *ZoneStateSensorDataPoints    `json:"sensorDataPoints"`
 }
 
 // ZoneStateSetting holds the setting of a zone
 type ZoneStateSetting struct {
-	Type        string                      `json:"type"`
-	Power       string                      `json:"power"`
-	Temperature ZoneStateSettingTemperature `json:"temperature"`
+	Type        string                       `json:"type"`
+	Power       string                       `json:"power"`
+	Temperature *ZoneStateSettingTemperature `json:"temperature"`
 }
 
 // ZoneStateSettingTemperature holds the temperature of a zone state setting
@@ -190,6 +188,17 @@ type ZoneStateOpenWindow struct {
 	DurationInSeconds      int32  `json:"durationInSeconds"`
 	Expiry                 string `json:"expiry"`
 	RemainingTimeInSeconds int32  `json:"remainingTimeInSeconds"`
+}
+
+// ZoneStateNextScheduledChange holds start time and settings of the next scheduled change
+type ZoneStateNextScheduledChange struct {
+	Start   string            `json:"start"`
+	Setting *ZoneStateSetting `json:"setting"`
+}
+
+// ZoneStateNextTimeBlock holds the start time of the next time block
+type ZoneStateNextTimeBlock struct {
+	Start string `json:"start"`
 }
 
 // ZoneStateLink holds the link information of a tado zone
@@ -347,6 +356,7 @@ type Device struct {
 	BatteryState     *string               `json:"batteryState,omitempty"`
 	ChildLockEnabled *bool                 `json:"childLockEnabled,omitempty"`
 	GatewayOperation *string               `json:"gatewayOperation,omitempty"`
+	Duties           []string              `json:"duties,omitempty"`
 }
 
 // DeviceConnectionState specifies if the device is connected or not
