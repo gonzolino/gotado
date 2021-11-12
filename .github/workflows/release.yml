@@ -6,12 +6,22 @@ on:
       - main
 
 jobs:
+  release-pr:
+    name: Release PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v2.34
+        with:
+          release-type: go
+          package-name: gotado
+          command: release-pr
   release:
-    name: Release Please
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - uses: GoogleCloudPlatform/release-please-action@v2.34
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          release-type: simple
+          release-type: go
           package-name: gotado
+          command: github-release
