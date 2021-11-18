@@ -69,7 +69,7 @@ func setZoneOverlay(client *Client, userHome *UserHome, zone *Zone, overlay *Zon
 // SetZoneOverlayHeatingOff turns off heating in a zone
 func SetZoneOverlayHeatingOff(client *Client, userHome *UserHome, zone *Zone) error {
 	overlay := &ZoneOverlay{
-		Setting: ZoneOverlaySetting{
+		Setting: &ZoneSetting{
 			Type:  "HEATING",
 			Power: "OFF",
 		},
@@ -92,7 +92,7 @@ func SetZoneOverlayHeatingOn(client *Client, userHome *UserHome, zone *Zone, tem
 	if err != nil || home == nil {
 		return nil, fmt.Errorf("unable to determine temperature unit")
 	}
-	temperatureSetting := &ZoneOverlaySettingTemperature{}
+	temperatureSetting := &ZoneSettingTemperature{}
 	switch home.TemperatureUnit {
 	case "CELSIUS":
 		temperatureSetting.Celsius = temperature
@@ -103,7 +103,7 @@ func SetZoneOverlayHeatingOn(client *Client, userHome *UserHome, zone *Zone, tem
 	}
 
 	overlay := &ZoneOverlay{
-		Setting: ZoneOverlaySetting{
+		Setting: &ZoneSetting{
 			Type:        "HEATING",
 			Power:       "ON",
 			Temperature: temperatureSetting,
@@ -173,7 +173,7 @@ func GetSchedule(client *Client, userHome *UserHome, zone *Zone, timetable *Sche
 func SetSchedule(client *Client, userHome *UserHome, zone *Zone, timetable *ScheduleTimetable, schedule []*ScheduleBlock) error {
 	// Order schedule blocks by day types.
 	// For each daytipe we want to send one put request.
-	scheduleMap := map[string][]*ScheduleBlock{}
+	scheduleMap := map[DayType][]*ScheduleBlock{}
 	for _, scheduleBlock := range schedule {
 		if _, ok := scheduleMap[scheduleBlock.DayType]; !ok {
 			scheduleMap[scheduleBlock.DayType] = make([]*ScheduleBlock, 0, 1)
@@ -210,7 +210,7 @@ func SetAwayTemperature(client *Client, userHome *UserHome, zone *Zone, temperat
 	if err != nil || home == nil {
 		return fmt.Errorf("unable to determine temperature unit")
 	}
-	temperatureSetting := &AwayConfigurationSettingTemperature{}
+	temperatureSetting := &ZoneSettingTemperature{}
 	switch home.TemperatureUnit {
 	case "CELSIUS":
 		temperatureSetting.Celsius = temperature
@@ -223,7 +223,7 @@ func SetAwayTemperature(client *Client, userHome *UserHome, zone *Zone, temperat
 	awayConfig := &AwayConfiguration{
 		Type:       "HEATING",
 		AutoAdjust: false,
-		Setting: &AwayConfigurationSetting{
+		Setting: &ZoneSetting{
 			Type:        "HEATING",
 			Power:       "ON",
 			Temperature: temperatureSetting,
@@ -239,7 +239,7 @@ func SetAwayComfortLevel(client *Client, userHome *UserHome, zone *Zone, comfort
 	awayConfig := &AwayConfiguration{
 		Type:         "HEATING",
 		AutoAdjust:   true,
-		ComfortLevel: comfortLevel,
+		ComfortLevel: ComfortLevel(comfortLevel),
 	}
 	return SetAwayConfiguration(client, userHome, zone, awayConfig)
 }
@@ -252,7 +252,7 @@ func setPresenceLock(client *Client, userHome *UserHome, presence PresenceLock) 
 // SetPresenceHome sets the geofencing presence to 'at home'
 func SetPresenceHome(client *Client, userHome *UserHome) error {
 	presence := PresenceLock{
-		HomePresence: "HOME",
+		HomePresence: PresenceHome,
 	}
 	return setPresenceLock(client, userHome, presence)
 }
@@ -260,7 +260,7 @@ func SetPresenceHome(client *Client, userHome *UserHome) error {
 // SetPresenceAway sets the geofencing presence to 'away'
 func SetPresenceAway(client *Client, userHome *UserHome) error {
 	presence := PresenceLock{
-		HomePresence: "AWAY",
+		HomePresence: PresenceAway,
 	}
 	return setPresenceLock(client, userHome, presence)
 }
