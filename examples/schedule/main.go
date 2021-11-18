@@ -125,10 +125,10 @@ func main() {
 			Start:               "00:00",
 			End:                 "12:00",
 			GeolocationOverride: false,
-			Setting: gotado.ScheduleBlockSetting{
+			Setting: &gotado.ZoneSetting{
 				Type:  "HEATING",
 				Power: "ON",
-				Temperature: &gotado.ScheduleBlockSettingTemperature{
+				Temperature: &gotado.ZoneSettingTemperature{
 					Celsius: 18,
 				},
 			},
@@ -138,7 +138,7 @@ func main() {
 			Start:               "12:00",
 			End:                 "14:00",
 			GeolocationOverride: false,
-			Setting: gotado.ScheduleBlockSetting{
+			Setting: &gotado.ZoneSetting{
 				Type:  "HEATING",
 				Power: "OFF",
 			},
@@ -148,10 +148,10 @@ func main() {
 			Start:               "14:00",
 			End:                 "00:00",
 			GeolocationOverride: false,
-			Setting: gotado.ScheduleBlockSetting{
+			Setting: &gotado.ZoneSetting{
 				Type:  "HEATING",
 				Power: "ON",
-				Temperature: &gotado.ScheduleBlockSettingTemperature{
+				Temperature: &gotado.ZoneSettingTemperature{
 					Celsius: 20,
 				},
 			},

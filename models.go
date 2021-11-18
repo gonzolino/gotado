@@ -1,5 +1,7 @@
 package gotado
 
+import "time"
+
 // User represents a tado° user
 type User struct {
 	Name          string         `json:"name"`
@@ -17,13 +19,21 @@ type UserHome struct {
 	Name string `json:"name"`
 }
 
+// TemperatureUnit defines the unit in which a temperature is measured
+type TemperatureUnit string
+
+const (
+	TemperatureUnitCelsius    TemperatureUnit = "CELSIUS"
+	TemperatureUnitFahrenheit TemperatureUnit = "FAHRENHEIT"
+)
+
 // Home represents a home equipped with tado°
 type Home struct {
 	ID                         int32                 `json:"id"`
 	Name                       string                `json:"name"`
 	DateTimeZone               string                `json:"dateTimeZone"`
-	DateCreated                string                `json:"dateCreated"`
-	TemperatureUnit            string                `json:"temperatureUnit"`
+	DateCreated                time.Time             `json:"dateCreated"`
+	TemperatureUnit            TemperatureUnit       `json:"temperatureUnit"`
 	SimpleSmartScheduleEnabled bool                  `json:"simpleSmartScheduleEnabled"`
 	AwayRadiusInmeters         float32               `json:"awayRadiusInMeters"`
 	InstallationCompleted      bool                  `json:"installationCompleted"`
@@ -67,19 +77,53 @@ type HomeGeolocation struct {
 	Longitude float64 `json:"longitude"`
 }
 
+// Presence defines if somebody is present at home
+type Presence string
+
+const (
+	PresenceHome Presence = "HOME"
+	PresenceAway Presence = "AWAY"
+)
+
 // HomeState represents the state of a tado° home
 type HomeState struct {
-	Presence       string `json:"presence"`
-	PresenceLocked bool   `json:"presenceLocked"`
+	Presence       Presence `json:"presence"`
+	PresenceLocked bool     `json:"presenceLocked"`
 }
+
+// ZoneType defines the type of a zone
+type ZoneType string
+
+const (
+	ZoneTypeHeating  = "HEATING"
+	ZoneTypeHotWater = "HOT_WATER"
+)
+
+// DeviceType defines the type of a device
+type DeviceType string
+
+const (
+	DeviceTypeInternetBridge               DeviceType = "IB01"
+	DeviceTypeExtensionKit01               DeviceType = "BU01"
+	DeviceTypeExtensionKit02               DeviceType = "BU02"
+	DeviceTypeSmartACControl01             DeviceType = "WR01"
+	DeviceTypeSmartACControl02             DeviceType = "WR02"
+	DeviceTypeSmartThermostat01            DeviceType = "RU01"
+	DeviceTypeSmartThermostat02            DeviceType = "RU02"
+	DeviceTypeSmartRadiatorThermostat01    DeviceType = "VA01"
+	DeviceTypeSmartRadiatorThermostat02    DeviceType = "VA02"
+	DeviceTypeWirelessTemperatureSensor01  DeviceType = "SU02"
+	DeviceTypeWirelessReceiverProgrammer01 DeviceType = "BP02"
+	DeviceTypeWirelessReceiverBoiler01     DeviceType = "BR02"
+)
 
 // Zone represents a tado° zone
 type Zone struct {
 	ID                  int32                   `json:"id"`
 	Name                string                  `json:"name"`
-	Type                string                  `json:"type"`
-	DateCreated         string                  `json:"dateCreated"`
-	DeviceTypes         []string                `json:"deviceTypes"`
+	Type                ZoneType                `json:"type"`
+	DateCreated         time.Time               `json:"dateCreated"`
+	DeviceTypes         []DeviceType            `json:"deviceTypes"`
 	Devices             []Device                `json:"devices"`
 	ReportAvailable     bool                    `json:"reportAvailable"`
 	SupportsDazzle      bool                    `json:"supportsDazzle"`
@@ -101,10 +145,10 @@ type ZoneOpenWindowDetection struct {
 	TimeoutInSeconds int32 `json:"timeoutInSeconds"`
 }
 
-// ZoneCapabilitiesstores the capabilities of a zone, such as the supported
+// ZoneCapabilities stores the capabilities of a zone, such as the supported
 // min/max temperatures
 type ZoneCapabilities struct {
-	Type              string                        `json:"type"`
+	Type              ZoneType                      `json:"type"`
 	CanSetTemperature *bool                         `json:"canSetTemperature,omitempty"`
 	Temperatures      *ZoneCapabilitiesTemperatures `json:"temperatures,omitempty"`
 }
@@ -123,13 +167,20 @@ type ZoneCapabilitiesTemperatureValues struct {
 	Step float32 `json:"step"`
 }
 
+// OverlayType specifies the type of an overlay
+type OverlayType string
+
+const (
+	OverlayTypeManual OverlayType = "MANUAL"
+)
+
 // ZoneState represents the state of a tado° zone
 type ZoneState struct {
 	TadoMode                       string                        `json:"tadoMode"`
 	GeolocationOverride            bool                          `json:"geolocationOverride"`
 	GeolocationOverrideDisableTime *string                       `json:"geolocationOverrideDisableTime"`
-	Setting                        ZoneStateSetting              `json:"setting"`
-	OverlayType                    *string                       `json:"overlayType"`
+	Setting                        ZoneSetting                   `json:"setting"`
+	OverlayType                    *OverlayType                  `json:"overlayType"`
 	Overlay                        *ZoneOverlay                  `json:"overlay"`
 	OpenWindow                     *ZoneStateOpenWindow          `json:"openWindow"`
 	NextScheduledChange            *ZoneStateNextScheduledChange `json:"nextScheduleChange"`
@@ -139,37 +190,32 @@ type ZoneState struct {
 	SensorDataPoints               *ZoneStateSensorDataPoints    `json:"sensorDataPoints"`
 }
 
-// ZoneStateSetting holds the setting of a zone
-type ZoneStateSetting struct {
-	Type        string                       `json:"type"`
-	Power       string                       `json:"power"`
-	Temperature *ZoneStateSettingTemperature `json:"temperature"`
+// Power specifies is something is powered on or off
+type Power string
+
+const (
+	PowerOn  Power = "ON"
+	PowerOff Power = "OFF"
+)
+
+// ZoneSetting holds the setting of a zone
+type ZoneSetting struct {
+	Type        ZoneType                `json:"type"`
+	Power       Power                   `json:"power"`
+	Temperature *ZoneSettingTemperature `json:"temperature"`
 }
 
-// ZoneStateSettingTemperature holds the temperature of a zone state setting
-type ZoneStateSettingTemperature struct {
+// ZoneSettingTemperature holds the temperature of a zone state setting
+type ZoneSettingTemperature struct {
 	Celsius    float64 `json:"celsius"`
 	Fahrenheit float64 `json:"fahrenheit"`
 }
 
 // ZoneOverlay holds overlay information of a zone
 type ZoneOverlay struct {
-	Type        string                  `json:"type,omitempty"`
-	Setting     ZoneOverlaySetting      `json:"setting"`
+	Type        OverlayType             `json:"type,omitempty"`
+	Setting     *ZoneSetting            `json:"setting"`
 	Termination *ZoneOverlayTermination `json:"termination,omitempty"`
-}
-
-// ZoneOverlaySetting holds the setting of a zone overlay
-type ZoneOverlaySetting struct {
-	Type        string                         `json:"type"`
-	Power       string                         `json:"power"`
-	Temperature *ZoneOverlaySettingTemperature `json:"temperature,omitempty"`
-}
-
-// ZoneOverlaySettingTemperature holds the temperature of a zone state setting
-type ZoneOverlaySettingTemperature struct {
-	Celsius    float64 `json:"celsius"`
-	Fahrenheit float64 `json:"fahrenheit"`
 }
 
 // ZoneOverlayTermination holdes the termination information of a zone overlay
@@ -192,13 +238,13 @@ type ZoneStateOpenWindow struct {
 
 // ZoneStateNextScheduledChange holds start time and settings of the next scheduled change
 type ZoneStateNextScheduledChange struct {
-	Start   string            `json:"start"`
-	Setting *ZoneStateSetting `json:"setting"`
+	Start   time.Time    `json:"start"`
+	Setting *ZoneSetting `json:"setting"`
 }
 
 // ZoneStateNextTimeBlock holds the start time of the next time block
 type ZoneStateNextTimeBlock struct {
-	Start string `json:"start"`
+	Start time.Time `json:"start"`
 }
 
 // ZoneStateLink holds the link information of a tado zone
@@ -208,97 +254,118 @@ type ZoneStateLink struct {
 
 // ZoneStateActivityDataPoints holds activity data points for a zone
 type ZoneStateActivityDataPoints struct {
-	HeatingPower *ZoneStateActivityDataPointsHeatingPower `json:"heatingPower"`
-}
-
-// ZoneStateActivityDataPointsHeatingPower holds information about the heating power in a zone
-type ZoneStateActivityDataPointsHeatingPower struct {
-	Type       string  `json:"type"`
-	Percentage float64 `json:"percentage"`
-	Timestamp  string  `json:"timestamp"`
+	HeatingPower *PercentageMeasurement `json:"heatingPower"`
 }
 
 // ZoneStateSensorDataPoints holds sensor data points for a zone
 type ZoneStateSensorDataPoints struct {
-	InsideTemperature *ZoneStateSensorDataPointsInsideTemperature `json:"insideTemperature"`
-	Humidity          *ZoneStateSensorDataPointsHumidity          `json:"humidity"`
+	InsideTemperature *TemperatureMeasurement `json:"insideTemperature"`
+	Humidity          *PercentageMeasurement  `json:"humidity"`
 }
 
-// ZoneStateSensorDataPointsInsideTemperature holds information about the inside temperature of a zone
-type ZoneStateSensorDataPointsInsideTemperature struct {
-	Celsius    float64                                             `json:"celsius"`
-	Fahrenheit float64                                             `json:"fahrenheit"`
-	Timestamp  string                                              `json:"timestamp"`
-	Type       string                                              `json:"type"`
-	Precision  ZoneStateSensorDataPointsInsideTemperaturePrecision `json:"precision"`
+// MeasurementType specifies teh type of a measurement
+type MeasurementType string
+
+const (
+	MeasurementTypeTemperature MeasurementType = "TEMPERATURE"
+	MeasurementTypePercentage  MeasurementType = "PERCENTAGE"
+	MeasurementTypeWeather     MeasurementType = "WEATHER_STATE"
+)
+
+// Measurement measures a value at a certain point in time.
+// See MeasurementType for available types of measurements.
+type Measurement struct {
+	Type      MeasurementType `json:"type"`
+	Timestamp time.Time       `json:"timestamp"`
 }
 
-// ZoneStateSensorDataPointsInsideTemperaturePrecision holds the precision of inside temperature of a zone
-type ZoneStateSensorDataPointsInsideTemperaturePrecision struct {
+// TemperatureMeasurement holds a measured temperature
+type TemperatureMeasurement struct {
+	Measurement
+	Celsius    float64                         `json:"celsius"`
+	Fahrenheit float64                         `json:"fahrenheit"`
+	Precision  TemperatureMeasurementPrecision `json:"precision"`
+}
+
+// TemperatureMeasurementPrecision holds the precision of a temperature measurement
+type TemperatureMeasurementPrecision struct {
 	Celsius    float64 `json:"celsius"`
 	Fahrenheit float64 `json:"fahrenheit"`
 }
 
-// ZoneStateSensorDataPointsHumidity holds humidity information of a zone
-type ZoneStateSensorDataPointsHumidity struct {
-	Type       string  `json:"type"`
+// PercentageMeasurement holds a measured percentage
+type PercentageMeasurement struct {
+	Measurement
 	Percentage float64 `json:"percentage"`
-	Timestamp  string  `json:"timestamp"`
 }
+
+// WeatherMeasurement holds a measurement of the weather state
+type WeatherMeasurement struct {
+	Measurement
+	Value string `json:"value"`
+}
+
+type TimetableType string
+
+const (
+	TimetableTypeOneDay   TimetableType = "ONE_DAY"
+	TimetableTypeThreeDay TimetableType = "THREE_DAY"
+	TimetableTypeSevenDay TimetableType = "SEVEN_DAY"
+)
 
 // ScheduleTimetable is the type of a tado° schedule timetable
 type ScheduleTimetable struct {
-	ID   int32  `json:"id"`
-	Type string `json:"type,omitempty"`
+	ID   int32         `json:"id"`
+	Type TimetableType `json:"type,omitempty"`
 }
+
+// DayType specifies the type of day for a heating schedule block
+type DayType string
+
+const (
+	DayTypeMondayToSunday DayType = "MONDAY_TO_SUNDAY"
+	DayTypeMondayToFriday DayType = "MONDAY_TO_FRIDAY"
+	DayTypeMonday         DayType = "MONDAY"
+	DayTypeTuesday        DayType = "TUESDAY"
+	DayTypeWednesday      DayType = "WEDNESDAY"
+	DayTypeThursday       DayType = "THURSDAY"
+	DayTypeFriday         DayType = "FRIDAY"
+	DayTypeSaturday       DayType = "SATURDAY"
+	DayTypeSunday         DayType = "SUNDAY"
+)
 
 // ScheduleBlock is a block in a tado° schedule
 type ScheduleBlock struct {
-	DayType             string               `json:"dayType"`
-	Start               string               `json:"start"`
-	End                 string               `json:"end"`
-	GeolocationOverride bool                 `json:"geolocationOverride"`
-	Setting             ScheduleBlockSetting `json:"setting"`
+	DayType             DayType      `json:"dayType"`
+	Start               string       `json:"start"`
+	End                 string       `json:"end"`
+	GeolocationOverride bool         `json:"geolocationOverride"`
+	Setting             *ZoneSetting `json:"setting"`
 }
 
-// ScheduleBlockSetting holds the setting of a schedule block
-type ScheduleBlockSetting struct {
-	Type        string                           `json:"type"`
-	Power       string                           `json:"power"`
-	Temperature *ScheduleBlockSettingTemperature `json:"temperature,omitempty"`
-}
+// ComfortLevel defines how a zone is preheated before arrival
+type ComfortLevel int32
 
-// ZoneOverlaySettingTemperature holds the temperature of a schedule block setting
-type ScheduleBlockSettingTemperature struct {
-	Celsius    float64 `json:"celsius"`
-	Fahrenheit float64 `json:"fahrenheit"`
-}
+const (
+	// ComfortLevelEco will not preheat the zone too early before arrival and only reach the target temperature after arrival
+	ComfortLevelEco = 0
+	// ComfortLevelBalance will find the best trade-off between comfort and savings
+	ComfortLevelBalance = 50
+	// ComfortLevelComfort ensures that the desired home temperature is reached shortly before arrival
+	ComfortLevelComfort = 100
+)
 
 // AwayConfiguration holds the settings to use when everybody leaves the house
 type AwayConfiguration struct {
-	Type       string `json:"type"`
-	AutoAdjust bool   `json:"autoAdjust"`
-	// Comfort Level must be 0 (Eco), 50 (Balanced) or 100 (Comfort)
-	ComfortLevel int32                     `json:"comfortLevel"`
-	Setting      *AwayConfigurationSetting `json:"setting"`
-}
-
-// AwayConfigurationSetting holds the setting of an away configuration
-type AwayConfigurationSetting struct {
-	Type        string                               `json:"type"`
-	Power       string                               `json:"power"`
-	Temperature *AwayConfigurationSettingTemperature `json:"temperature,omitempty"`
-}
-
-// AwayConfigurationSettingTemperature holds the temperature of an away configuration setting
-type AwayConfigurationSettingTemperature struct {
-	Celsius    float64 `json:"celsius"`
-	Fahrenheit float64 `json:"fahrenheit"`
+	Type         ZoneType     `json:"type"`
+	AutoAdjust   bool         `json:"autoAdjust"`
+	ComfortLevel ComfortLevel `json:"comfortLevel"`
+	Setting      *ZoneSetting `json:"setting"`
 }
 
 // PresenceLock holds a locked presence setting for a home
 type PresenceLock struct {
-	HomePresence string `json:"homePresence"`
+	HomePresence Presence `json:"homePresence"`
 }
 
 // EarlyStart controls whether tado° ensures that a set temperature is reached
@@ -309,43 +376,14 @@ type EarlyStart struct {
 
 // Weather holds weather information from the home's location
 type Weather struct {
-	SolarIntensity     *WeatherSolarIntensity     `json:"solarIntensity"`
-	OutsideTemperature *WeatherOutsideTemperature `json:"outsideTemperature"`
-	WeatherState       *WeatherState              `json:"weatherState"`
-}
-
-// WeatherSolarIntensity holds the solar intensity at the home's location as a percentage
-type WeatherSolarIntensity struct {
-	Type       string  `json:"type"`
-	Percentage float64 `json:"percentage"`
-	Timestamp  string  `json:"timestamp"`
-}
-
-// WeatherOutsideTemperature holds the temperature outside of the home
-type WeatherOutsideTemperature struct {
-	Celsius    float64                            `json:"celsius"`
-	Fahrenheit float64                            `json:"fahrenheit"`
-	Timestamp  string                             `json:"timestamp"`
-	Type       string                             `json:"type"`
-	Precision  WeatherOutsideTemperaturePrecision `json:"precision"`
-}
-
-// WeatherOutsideTemperaturePrecision holds the precision of the home's outside temperature
-type WeatherOutsideTemperaturePrecision struct {
-	Celsius    float64 `json:"celsius"`
-	Fahrenheit float64 `json:"fahrenheit"`
-}
-
-// WeatherState stores the state of the weather, e.g. rain, sunny, foggy...
-type WeatherState struct {
-	Type      string `json:"type"`
-	Value     string `json:"value"`
-	Timestamp string `json:"timestamp"`
+	SolarIntensity     *PercentageMeasurement  `json:"solarIntensity"`
+	OutsideTemperature *TemperatureMeasurement `json:"outsideTemperature"`
+	WeatherState       *WeatherMeasurement     `json:"weatherState"`
 }
 
 // Device represents a tado° device such as a thermostat or a bridge
 type Device struct {
-	DeviceType       string                `json:"deviceType"`
+	DeviceType       DeviceType            `json:"deviceType"`
 	SerialNo         string                `json:"serialNo"`
 	ShortSerialNo    string                `json:"shortSerialNo"`
 	CurrentFwVersion string                `json:"currentFwVersion"`
@@ -361,19 +399,19 @@ type Device struct {
 
 // DeviceConnectionState specifies if the device is connected or not
 type DeviceConnectionState struct {
-	Value     bool   `json:"value"`
-	Timestamp string `json:"timestamp"`
+	Value     bool      `json:"value"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 // DeviceCharacteristics lists the capabilities of a device
 type DeviceCharacteristics struct {
-	Capabilities []string `json:"characteristics"`
+	Capabilities []string `json:"capabilities"`
 }
 
 // DeviceMountingState holds the mounting state of a device, e.g. if it is calibrated
 type DeviceMountingState struct {
-	Value     string `json:"value"`
-	Timestamp string `json:"timestamp"`
+	Value     string    `json:"value"`
+	Timestamp time.Time `json:"timestamp"`
 }
 
 // Installation holds information about a tado° hardware installation
