@@ -247,9 +247,24 @@ type ZoneStateNextTimeBlock struct {
 	Start time.Time `json:"start"`
 }
 
+// LinkState holds the state of a link (online or offline)
+type LinkState string
+
+const (
+	LinkStateOnline  LinkState = "ONLINE"
+	LinkStateOffline LinkState = "OFFLINE"
+)
+
 // ZoneStateLink holds the link information of a tado zone
 type ZoneStateLink struct {
-	State string `json:"state"`
+	State  string              `json:"state"`
+	Reason ZoneStateLinkReason `json:"reason,omitempty"`
+}
+
+// ZoneStateLinkReason holds the reason why a link is offline
+type ZoneStateLinkReason struct {
+	Code  string `json:"code"`
+	Title string `json:"title"`
 }
 
 // ZoneStateActivityDataPoints holds activity data points for a zone
