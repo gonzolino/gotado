@@ -10,7 +10,7 @@ jobs:
     name: Release PR
     runs-on: ubuntu-latest
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v2.34
+      - uses: GoogleCloudPlatform/release-please-action@v2.35
         with:
           release-type: go
           package-name: gotado
@@ -19,7 +19,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v2.34
+      - uses: GoogleCloudPlatform/release-please-action@v2.35
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           release-type: go
