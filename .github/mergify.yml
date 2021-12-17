@@ -3,6 +3,8 @@ pull_request_rules:
     conditions:
       - author=dependabot[bot]
       - "check-success=DeepSource: Go"
+      - "check-success=DeepSource: Secrets"
+      - "check-success=DeepSource: Transformers"
       - "check-success=GitGuardian Security Checks"
       - "check-success=License Compliance"
     actions:
@@ -13,6 +15,8 @@ pull_request_rules:
     conditions:
       - author=gonzolino
       - "check-success=DeepSource: Go"
+      - "check-success=DeepSource: Secrets"
+      - "check-success=DeepSource: Transformers"
       - "check-success=GitGuardian Security Checks"
       - "check-success=License Compliance"
     actions:
