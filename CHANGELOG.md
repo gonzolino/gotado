@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.0](https://www.github.com/gonzolino/gotado/compare/v1.0.0...v1.1.0) (2021-12-17)
+
+
+### Features
+
+* add link state info to zone state ([a9ff31d](https://www.github.com/gonzolino/gotado/commit/a9ff31d25b92c92be16349e9b4fba753c0fa5a0d))
+* add some missing fields to models ([f506072](https://www.github.com/gonzolino/gotado/commit/f5060721d468528673128433ffba1a00193cdac8))
+* introduce proper types and constants for models ([234d625](https://www.github.com/gonzolino/gotado/commit/234d6257386414856ab39eeecf5e3aa10c37e59a))
+
 ## [0.3.0](https://www.github.com/gonzolino/gotado/compare/v0.2.0...v0.3.0) (2021-07-14)
 
 
