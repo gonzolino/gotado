@@ -484,3 +484,9 @@ type MobileDeviceMetadata struct {
 	Model     string `json:"model"`
 	Locale    string `json:"locale"`
 }
+
+// TemperatureOffset holds the current temperature offsets for a tado° device
+type TemperatureOffset struct {
+	Celsius    float32 `json:"celsius"`
+	Fahrenheit float32 `json:"fahrenheit"`
+}
