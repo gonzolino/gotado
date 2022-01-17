@@ -357,3 +357,12 @@ func GetUsers(client *Client, userHome *UserHome) ([]*User, error) {
 	}
 	return users, nil
 }
+
+// GetTemperatureOffset returns the temperature offsets for a given tado° device
+func GetTemperatureOffset(client *Client, device *Device) (*TemperatureOffset, error) {
+	temperatureOffset := &TemperatureOffset{}
+	if err := client.get(apiURL("devices/%s/temperatureOffset", device.SerialNo), &temperatureOffset); err != nil {
+		return nil, err
+	}
+	return temperatureOffset, nil
+}
