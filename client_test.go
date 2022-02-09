@@ -44,7 +44,7 @@ func TestWithCredentials(t *testing.T) {
 		Expiry:       time.Now(),
 	}
 
-	client := NewClient("test", "test")
+	client := newClient("test", "test")
 	httpCtx := context.WithValue(ctx, oauth2.HTTPClient, client.http)
 
 	mockConfig.EXPECT().PasswordCredentialsToken(gomock.AssignableToTypeOf(httpCtx), "username", "password").Return(token, nil)
@@ -140,7 +140,7 @@ func TestGet(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			client := NewClient("test", "test")
+			client := newClient("test", "test")
 			client.http = mockHTTPClient{Response: tc.mockResp, Error: tc.mockErr}
 
 			result := &foobar{}
@@ -216,7 +216,7 @@ func TestPost(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			client := NewClient("test", "test")
+			client := newClient("test", "test")
 			client.http = mockHTTPClient{Response: tc.mockResp, Error: tc.mockErr}
 
 			err := client.post(tc.url)
@@ -345,7 +345,7 @@ func TestPut(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			client := NewClient("test", "test")
+			client := newClient("test", "test")
 			client.http = mockHTTPClient{Response: tc.mockResp, Error: tc.mockErr}
 			data := tc.data
 
@@ -420,7 +420,7 @@ func TestDelete(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			client := NewClient("test", "test")
+			client := newClient("test", "test")
 			client.http = mockHTTPClient{Response: tc.mockResp, Error: tc.mockErr}
 
 			err := client.delete(tc.url)
