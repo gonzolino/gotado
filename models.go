@@ -4,6 +4,7 @@ import "time"
 
 // User represents a tado° user
 type User struct {
+	client        *client
 	Name          string         `json:"name"`
 	Email         string         `json:"email"`
 	Username      string         `json:"username"`
