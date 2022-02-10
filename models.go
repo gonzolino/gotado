@@ -30,6 +30,7 @@ const (
 
 // Home represents a home equipped with tado°
 type Home struct {
+	client                     *client
 	ID                         int32                 `json:"id"`
 	Name                       string                `json:"name"`
 	DateTimeZone               string                `json:"dateTimeZone"`

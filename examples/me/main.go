@@ -38,12 +38,12 @@ func main() {
 	fmt.Printf("Email: %s\nUsername: %s\nName: %s\n", user.Email, user.Username, user.Name)
 
 	// for each home: get home info and print name and address
-	// for _, userHome := range user.Homes {
-	// 	home, err := gotado.GetHome(client, &userHome)
-	// 	if err != nil {
-	// 		fmt.Fprintf(os.Stderr, "Failed to get user home info: %v\n", err)
-	// 		os.Exit(1)
-	// 	}
-	// 	fmt.Printf("Home: %s\nAddress:\n%s\n%s %s\n", home.Name, *home.Address.AddressLine1, *home.Address.ZipCode, *home.Address.City)
-	// }
+	for _, userHome := range user.Homes {
+		home, err := user.GetHome(ctx, userHome.Name)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to get user home info: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Home: %s\nAddress:\n%s\n%s %s\n", home.Name, *home.Address.AddressLine1, *home.Address.ZipCode, *home.Address.City)
+	}
 }
