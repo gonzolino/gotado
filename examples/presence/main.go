@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 
@@ -35,37 +34,23 @@ func main() {
 	homeName := os.Args[1]
 
 	ctx := context.Background()
+	tado := gotado.New(clientID, clientSecret)
 
-	// Create authenticated tado° client
-	httpClient := &http.Client{Timeout: 5 * time.Second}
-	client := gotado.NewClient(clientID, clientSecret).WithHTTPClient(httpClient)
-	client, err := client.WithCredentials(ctx, username, password)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Authentication failed: %v\n", err)
-		os.Exit(1)
-	}
-
-	user, err := gotado.GetMe(client)
+	user, err := tado.Me(ctx, username, password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get user info: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Find the home to control
-	var home *gotado.UserHome
-	for _, h := range user.Homes {
-		if h.Name == homeName {
-			home = &h
-			break
-		}
-	}
-	if home == nil {
-		fmt.Fprintf(os.Stderr, "Home '%s' not found\n", homeName)
+	home, err := user.GetHome(ctx, homeName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to find home '%s': %v\n", homeName, err)
 		os.Exit(1)
 	}
 
 	// Get current presence from home state
-	state, err := gotado.GetHomeState(client, home)
+	state, err := home.GetState(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get home state: %v\n", err)
 		os.Exit(1)
@@ -78,7 +63,7 @@ func main() {
 	}
 
 	// Lock presence to 'away'
-	if err := gotado.SetPresenceAway(client, home); err != nil {
+	if err := home.SetPresenceAway(ctx); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set presence 'away': %v", err)
 		os.Exit(1)
 	}
@@ -87,7 +72,7 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	// Lock presence to 'at home'
-	if err := gotado.SetPresenceHome(client, home); err != nil {
+	if err := home.SetPresenceHome(ctx); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set presence 'home': %v", err)
 		os.Exit(1)
 	}
@@ -96,7 +81,7 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	// Set auto presence
-	if err := gotado.SetPresenceAuto(client, home); err != nil {
+	if err := home.SetPresenceAuto(ctx); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set presence 'auto': %v", err)
 		os.Exit(1)
 	}
@@ -108,9 +93,9 @@ func main() {
 	if state.PresenceLocked {
 		switch state.Presence {
 		case "HOME":
-			err = gotado.SetPresenceHome(client, home)
+			err = home.SetPresenceHome(ctx)
 		case "AWAY":
-			err = gotado.SetPresenceAway(client, home)
+			err = home.SetPresenceAway(ctx)
 		}
 
 		if err != nil {

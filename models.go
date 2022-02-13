@@ -121,6 +121,7 @@ const (
 
 // Zone represents a tado° zone
 type Zone struct {
+	client              *client
 	ID                  int32                   `json:"id"`
 	Name                string                  `json:"name"`
 	Type                ZoneType                `json:"type"`
@@ -400,6 +401,7 @@ type Weather struct {
 
 // Device represents a tado° device such as a thermostat or a bridge
 type Device struct {
+	client           *client
 	DeviceType       DeviceType            `json:"deviceType"`
 	SerialNo         string                `json:"serialNo"`
 	ShortSerialNo    string                `json:"shortSerialNo"`
@@ -442,6 +444,7 @@ type Installation struct {
 
 // MobileDevice represents a mobile device with the tado° app installed
 type MobileDevice struct {
+	client         *client
 	Name           string                `json:"name"`
 	ID             int32                 `json:"id"`
 	Settings       MobileDeviceSettings  `json:"settings"`
