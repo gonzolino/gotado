@@ -122,6 +122,7 @@ const (
 // Zone represents a tado° zone
 type Zone struct {
 	client              *client
+	home                *Home
 	ID                  int32                   `json:"id"`
 	Name                string                  `json:"name"`
 	Type                ZoneType                `json:"type"`
@@ -323,18 +324,36 @@ type WeatherMeasurement struct {
 	Value string `json:"value"`
 }
 
-type TimetableType string
-
-const (
-	TimetableTypeOneDay   TimetableType = "ONE_DAY"
-	TimetableTypeThreeDay TimetableType = "THREE_DAY"
-	TimetableTypeSevenDay TimetableType = "SEVEN_DAY"
-)
-
 // ScheduleTimetable is the type of a tado° schedule timetable
 type ScheduleTimetable struct {
-	ID   int32         `json:"id"`
-	Type TimetableType `json:"type,omitempty"`
+	client *client
+	ID     int32  `json:"id"`
+	Type   string `json:"type,omitempty"`
+}
+
+// TimetableMonToSun has the same schedule for all days between monday and sunday
+func TimetableMonToSun() *ScheduleTimetable {
+	return &ScheduleTimetable{
+		ID:   0,
+		Type: "ONE_DAY",
+	}
+}
+
+// TimetableTMonToFriSatSun has the same schedule for all days between monday
+// and friday and different schedules for saturday and sunday
+func TimetableMonToFriSatSun() *ScheduleTimetable {
+	return &ScheduleTimetable{
+		ID:   1,
+		Type: "THREE_DAY",
+	}
+}
+
+// TimetableAllDays has a different schedule for each day of the week
+func TimetableAllDays() *ScheduleTimetable {
+	return &ScheduleTimetable{
+		ID:   2,
+		Type: "SEVEN_DAY",
+	}
 }
 
 // DayType specifies the type of day for a heating schedule block
@@ -366,11 +385,11 @@ type ComfortLevel int32
 
 const (
 	// ComfortLevelEco will not preheat the zone too early before arrival and only reach the target temperature after arrival
-	ComfortLevelEco = 0
+	ComfortLevelEco ComfortLevel = 0
 	// ComfortLevelBalance will find the best trade-off between comfort and savings
-	ComfortLevelBalance = 50
+	ComfortLevelBalance ComfortLevel = 50
 	// ComfortLevelComfort ensures that the desired home temperature is reached shortly before arrival
-	ComfortLevelComfort = 100
+	ComfortLevelComfort ComfortLevel = 100
 )
 
 // AwayConfiguration holds the settings to use when everybody leaves the house

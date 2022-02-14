@@ -22,6 +22,7 @@ func (h *Home) GetZones(ctx context.Context) ([]*Zone, error) {
 	}
 	for _, zone := range zones {
 		zone.client = h.client
+		zone.home = h
 	}
 	return zones, nil
 }
