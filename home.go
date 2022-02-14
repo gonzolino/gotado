@@ -77,6 +77,7 @@ func (h *Home) GetMobileDevices(ctx context.Context) ([]*MobileDevice, error) {
 	}
 	for _, mobileDevice := range mobileDevices {
 		mobileDevice.client = h.client
+		mobileDevice.home = h
 	}
 	return mobileDevices, nil
 }

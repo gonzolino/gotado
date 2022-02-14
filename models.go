@@ -445,6 +445,7 @@ type Installation struct {
 // MobileDevice represents a mobile device with the tado° app installed
 type MobileDevice struct {
 	client         *client
+	home           *Home
 	Name           string                `json:"name"`
 	ID             int32                 `json:"id"`
 	Settings       MobileDeviceSettings  `json:"settings"`
