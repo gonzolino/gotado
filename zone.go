@@ -116,12 +116,40 @@ func (z *Zone) SetEarlyStart(ctx context.Context, earlyStart bool) error {
 	return z.client.put(ctx, apiURL("homes/%d/zones/%d/earlyStart", z.home.ID, z.ID), &EarlyStart{Enabled: earlyStart})
 }
 
+// newScheduleTimetable creates a new schedule timetable linked to the zone.
+func (z *Zone) newScheduleTimetable(id int32, typ string) *ScheduleTimetable {
+	return &ScheduleTimetable{
+		client: z.client,
+		zone:   z,
+		ID:     id,
+		Type:   typ,
+	}
+}
+
+// TimetableMonToSun has the same schedule for all days between monday and sunday.
+func (z *Zone) TimetableMonToSun() *ScheduleTimetable {
+	return z.newScheduleTimetable(0, "ONE_DAY")
+}
+
+// TimetableTMonToFriSatSun has the same schedule for all days between monday
+// and friday and different schedules for saturday and sunday.
+func (z *Zone) TimetableMonToFriSatSun() *ScheduleTimetable {
+	return z.newScheduleTimetable(1, "THREE_DAY")
+}
+
+// TimetableAllDays has a different schedule for each day of the week.
+func (z *Zone) TimetableAllDays() *ScheduleTimetable {
+	return z.newScheduleTimetable(2, "SEVEN_DAY")
+}
+
 // GetActiveTimetable returns the active schedule timetable for the zone.
 func (z *Zone) GetActiveTimetable(ctx context.Context) (*ScheduleTimetable, error) {
 	timetable := &ScheduleTimetable{}
 	if err := z.client.get(ctx, apiURL("homes/%d/zones/%d/schedule/activeTimetable", z.home.ID, z.ID), timetable); err != nil {
 		return nil, err
 	}
+	timetable.client = z.client
+	timetable.zone = z
 	return timetable, nil
 }
 

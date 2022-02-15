@@ -327,33 +327,9 @@ type WeatherMeasurement struct {
 // ScheduleTimetable is the type of a tado° schedule timetable
 type ScheduleTimetable struct {
 	client *client
+	zone   *Zone
 	ID     int32  `json:"id"`
 	Type   string `json:"type,omitempty"`
-}
-
-// TimetableMonToSun has the same schedule for all days between monday and sunday
-func TimetableMonToSun() *ScheduleTimetable {
-	return &ScheduleTimetable{
-		ID:   0,
-		Type: "ONE_DAY",
-	}
-}
-
-// TimetableTMonToFriSatSun has the same schedule for all days between monday
-// and friday and different schedules for saturday and sunday
-func TimetableMonToFriSatSun() *ScheduleTimetable {
-	return &ScheduleTimetable{
-		ID:   1,
-		Type: "THREE_DAY",
-	}
-}
-
-// TimetableAllDays has a different schedule for each day of the week
-func TimetableAllDays() *ScheduleTimetable {
-	return &ScheduleTimetable{
-		ID:   2,
-		Type: "SEVEN_DAY",
-	}
 }
 
 // DayType specifies the type of day for a heating schedule block
@@ -371,8 +347,8 @@ const (
 	DayTypeSunday         DayType = "SUNDAY"
 )
 
-// ScheduleBlock is a block in a tado° schedule
-type ScheduleBlock struct {
+// ScheduleTimeBlock is a block in a tado° schedule
+type ScheduleTimeBlock struct {
 	DayType             DayType      `json:"dayType"`
 	Start               string       `json:"start"`
 	End                 string       `json:"end"`

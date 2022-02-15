@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 
@@ -35,64 +34,34 @@ func main() {
 	homeName, zoneName := os.Args[1], os.Args[2]
 
 	ctx := context.Background()
+	tado := gotado.New(clientID, clientSecret)
 
-	// Create authenticated tado° client
-	httpClient := &http.Client{Timeout: 5 * time.Second}
-	client := gotado.NewClient(clientID, clientSecret).WithHTTPClient(httpClient)
-	client, err := client.WithCredentials(ctx, username, password)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Authentication failed: %v\n", err)
-		os.Exit(1)
-	}
-
-	user, err := gotado.GetMe(client)
+	user, err := tado.Me(ctx, username, password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get user info: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Find the home to control
-	var home *gotado.UserHome
-	for _, h := range user.Homes {
-		if h.Name == homeName {
-			home = &h
-			break
-		}
-	}
-	if home == nil {
-		fmt.Fprintf(os.Stderr, "Home '%s' not found\n", homeName)
+	home, err := user.GetHome(ctx, homeName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to find home '%s': %v\n", homeName, err)
 		os.Exit(1)
 	}
 
 	// Find zone to control
-	zones, err := gotado.GetZones(client, home)
+	zone, err := home.GetZone(ctx, zoneName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to get zones: %v\n", err)
-		os.Exit(1)
-	}
-	var zone *gotado.Zone
-	for _, z := range zones {
-		if z.Name == zoneName {
-			zone = z
-			break
-		}
-	}
-	if zone == nil {
-		fmt.Fprintf(os.Stderr, "Zone '%s' not found\n", zoneName)
+		fmt.Fprintf(os.Stderr, "Failed to find zone '%s': %v\n", zoneName, err)
 		os.Exit(1)
 	}
 
 	// Show schedule timetables
-	timetables, err := gotado.GetTimetables(client, home, zone)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to list available heating schedule timetables: %v\n", err)
-		os.Exit(1)
-	}
 	fmt.Println("Available heating schedule timetables:")
-	for _, timetable := range timetables {
+	for _, timetable := range []*gotado.ScheduleTimetable{zone.TimetableMonToSun(), zone.TimetableMonToFriSatSun(), zone.TimetableAllDays()} {
 		fmt.Printf("%s (%d)\n", timetable.Type, timetable.ID)
 	}
-	activeTimetable, err := gotado.GetActiveTimetable(client, home, zone)
+	activeTimetable, err := zone.GetActiveTimetable(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get active heating schedule timetable: %v\n", err)
 		os.Exit(1)
@@ -100,7 +69,7 @@ func main() {
 	fmt.Printf("Active heating schedule timetable: %s (%d)\n", activeTimetable.Type, activeTimetable.ID)
 
 	// Get and print schedule
-	schedule, err := gotado.GetSchedule(client, home, zone, activeTimetable)
+	schedule, err := activeTimetable.GetScheduleTimeBlocks(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get heating schedule: %v\n", err)
 		os.Exit(1)
@@ -115,11 +84,8 @@ func main() {
 	}
 
 	// Update schedule
-	newTimetable := &gotado.ScheduleTimetable{
-		ID:   0,
-		Type: "ONE_DAY",
-	}
-	newSchedule := []*gotado.ScheduleBlock{
+	newTimetable := zone.TimetableMonToSun()
+	newSchedule := []*gotado.ScheduleTimeBlock{
 		{
 			DayType:             "MONDAY_TO_SUNDAY",
 			Start:               "00:00",
@@ -157,11 +123,11 @@ func main() {
 			},
 		},
 	}
-	if err := gotado.SetActiveTimetable(client, home, zone, newTimetable); err != nil {
+	if err := zone.SetActiveTimetable(ctx, newTimetable); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule timetable: %v\n", err)
 		os.Exit(1)
 	}
-	if err := gotado.SetSchedule(client, home, zone, newTimetable, newSchedule); err != nil {
+	if err := newTimetable.SetScheduleTimeBlocks(ctx, newSchedule); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set heating schedule: %v\n", err)
 		os.Exit(1)
 	}
@@ -170,11 +136,11 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	// Restore original heating schedule
-	if err := gotado.SetActiveTimetable(client, home, zone, activeTimetable); err != nil {
+	if err := zone.SetActiveTimetable(ctx, activeTimetable); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule timetable: %v\n", err)
 		os.Exit(1)
 	}
-	if err := gotado.SetSchedule(client, home, zone, activeTimetable, schedule); err != nil {
+	if err := activeTimetable.SetScheduleTimeBlocks(ctx, schedule); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set heating schedule: %v\n", err)
 		os.Exit(1)
 	}
