@@ -73,8 +73,8 @@ func (c *client) Do(req *http.Request) (*http.Response, error) {
 }
 
 // Request performs an HTTP request to the tado° API
-func (c *client) Request(method, url string, body io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
+func (c *client) Request(ctx context.Context, method, url string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create http request: %w", err)
 	}
@@ -82,8 +82,8 @@ func (c *client) Request(method, url string, body io.Reader) (*http.Response, er
 }
 
 // RequestWithHeaders performs an HTTP request to the tado° API with the given map of HTTP headers
-func (c *client) RequestWithHeaders(method, url string, body io.Reader, headers map[string]string) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, body)
+func (c *client) RequestWithHeaders(ctx context.Context, method, url string, body io.Reader, headers map[string]string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, method, url, body)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create http request: %w", err)
 	}
@@ -94,8 +94,8 @@ func (c *client) RequestWithHeaders(method, url string, body io.Reader, headers 
 }
 
 // get retrieves an object from the tado° API.
-func (c *client) get(url string, v interface{}) error {
-	resp, err := c.Request(http.MethodGet, url, nil)
+func (c *client) get(ctx context.Context, url string, v interface{}) error {
+	resp, err := c.Request(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
@@ -113,8 +113,8 @@ func (c *client) get(url string, v interface{}) error {
 }
 
 // post sends a post request to the tado° API.
-func (c *client) post(url string) error {
-	resp, err := c.Request(http.MethodPost, url, nil)
+func (c *client) post(ctx context.Context, url string) error {
+	resp, err := c.Request(ctx, http.MethodPost, url, nil)
 	if err != nil {
 		return err
 	}
@@ -133,12 +133,12 @@ func (c *client) post(url string) error {
 // If the update is successful and v is a pointer, put will decode the response
 // body into the value pointed to by v. If v is not a pointer the response body
 // will be ignored.
-func (c *client) put(url string, v interface{}) error {
+func (c *client) put(ctx context.Context, url string, v interface{}) error {
 	data, err := json.Marshal(v)
 	if err != nil {
 		return fmt.Errorf("unable to marshal object: %w", err)
 	}
-	resp, err := c.RequestWithHeaders(http.MethodPut, url, bytes.NewReader(data),
+	resp, err := c.RequestWithHeaders(ctx, http.MethodPut, url, bytes.NewReader(data),
 		map[string]string{"Content-Type": "application/json;charset=utf-8"})
 	if err != nil {
 		return err
@@ -161,8 +161,8 @@ func (c *client) put(url string, v interface{}) error {
 }
 
 // delete deletes an object from the tado° API.
-func (c *client) delete(url string) error {
-	resp, err := c.Request(http.MethodDelete, url, nil)
+func (c *client) delete(ctx context.Context, url string) error {
+	resp, err := c.Request(ctx, http.MethodDelete, url, nil)
 	if err != nil {
 		return err
 	}
