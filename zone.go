@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-// GetZoneState returns the state of the zone.
+// GetState returns the state of the zone.
 func (z *Zone) GetState(ctx context.Context) (*ZoneState, error) {
 	state := &ZoneState{}
 	if err := z.client.get(ctx, apiURL("homes/%d/zones/%d/state", z.home.ID, z.ID), state); err != nil {
@@ -15,7 +15,7 @@ func (z *Zone) GetState(ctx context.Context) (*ZoneState, error) {
 	return state, nil
 }
 
-// GetZoneCapabilities returns the capabilities of the zone.
+// GetCapabilities returns the capabilities of the zone.
 func (z *Zone) GetCapabilities(ctx context.Context) (*ZoneCapabilities, error) {
 	capabilities := &ZoneCapabilities{}
 	if err := z.client.get(ctx, apiURL("homes/%d/zones/%d/capabilities", z.home.ID, z.ID), capabilities); err != nil {
@@ -24,7 +24,7 @@ func (z *Zone) GetCapabilities(ctx context.Context) (*ZoneCapabilities, error) {
 	return capabilities, nil
 }
 
-// GetZoneDevices lists all devices in the zone
+// GetDevices lists all devices in the zone
 func (z *Zone) GetDevices(ctx context.Context) ([]*Device, error) {
 	devices := make([]*Device, 0)
 	if err := z.client.get(ctx, apiURL("homes/%d/zones/%d/devices", z.home.ID, z.ID), &devices); err != nil {

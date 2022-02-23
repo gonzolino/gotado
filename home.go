@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// GetHomeState returns the state of the home
+// GetState returns the state of the home
 func (h *Home) GetState(ctx context.Context) (*HomeState, error) {
 	homeState := &HomeState{}
 	if err := h.client.get(ctx, apiURL("homes/%d/state", h.ID), homeState); err != nil {

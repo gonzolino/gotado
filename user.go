@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// GetHome returns the home with the given name
 func (u *User) GetHome(ctx context.Context, name string) (*Home, error) {
 	var homeID int32
 	for _, h := range u.Homes {

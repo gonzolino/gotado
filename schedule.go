@@ -11,6 +11,7 @@ func (s *ScheduleTimetable) GetScheduleTimeBlocks(ctx context.Context) ([]*Sched
 	return blocks, nil
 }
 
+// SetScheduleTimeBlocks updates the timetable schedule with the given time blocks.
 func (s *ScheduleTimetable) SetScheduleTimeBlocks(ctx context.Context, schedule []*ScheduleTimeBlock) error {
 	// Order schedule blocks by day types.
 	// For each daytipe we want to send one put request.
