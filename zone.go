@@ -126,24 +126,24 @@ func (z *Zone) newScheduleTimetable(id int32, typ string) *ScheduleTimetable {
 	}
 }
 
-// TimetableMonToSun has the same schedule for all days between monday and sunday.
-func (z *Zone) TimetableMonToSun() *ScheduleTimetable {
+// ScheduleMonToSun has the same schedule for all days between monday and sunday.
+func (z *Zone) ScheduleMonToSun() *ScheduleTimetable {
 	return z.newScheduleTimetable(0, "ONE_DAY")
 }
 
 // TimetableTMonToFriSatSun has the same schedule for all days between monday
 // and friday and different schedules for saturday and sunday.
-func (z *Zone) TimetableMonToFriSatSun() *ScheduleTimetable {
+func (z *Zone) ScheduleMonToFriSatSun() *ScheduleTimetable {
 	return z.newScheduleTimetable(1, "THREE_DAY")
 }
 
-// TimetableAllDays has a different schedule for each day of the week.
-func (z *Zone) TimetableAllDays() *ScheduleTimetable {
+// ScheduleAllDays has a different schedule for each day of the week.
+func (z *Zone) ScheduleAllDays() *ScheduleTimetable {
 	return z.newScheduleTimetable(2, "SEVEN_DAY")
 }
 
-// GetActiveTimetable returns the active schedule timetable for the zone.
-func (z *Zone) GetActiveTimetable(ctx context.Context) (*ScheduleTimetable, error) {
+// GetActiveScheduleTimetable returns the active schedule timetable for the zone.
+func (z *Zone) GetActiveScheduleTimetable(ctx context.Context) (*ScheduleTimetable, error) {
 	timetable := &ScheduleTimetable{}
 	if err := z.client.get(ctx, apiURL("homes/%d/zones/%d/schedule/activeTimetable", z.home.ID, z.ID), timetable); err != nil {
 		return nil, err
@@ -153,9 +153,9 @@ func (z *Zone) GetActiveTimetable(ctx context.Context) (*ScheduleTimetable, erro
 	return timetable, nil
 }
 
-// SetActiveTimetable sets the active schedule timetable for the zone.
+// SetActiveScheduleTimetable sets the active schedule timetable for the zone.
 // Should be one of TimetableMonToSun(), TimetableMonToFriSatSun() or TimetableAllDays(),
-func (z *Zone) SetActiveTimetable(ctx context.Context, timetable *ScheduleTimetable) error {
+func (z *Zone) SetActiveScheduleTimetable(ctx context.Context, timetable *ScheduleTimetable) error {
 	newTimetable := &ScheduleTimetable{ID: timetable.ID}
 	return z.client.put(ctx, apiURL("homes/%d/zones/%d/schedule/activeTimetable", z.home.ID, z.ID), newTimetable)
 }

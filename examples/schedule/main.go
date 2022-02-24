@@ -58,24 +58,24 @@ func main() {
 
 	// Show schedule timetables
 	fmt.Println("Available heating schedule timetables:")
-	for _, timetable := range []*gotado.ScheduleTimetable{zone.TimetableMonToSun(), zone.TimetableMonToFriSatSun(), zone.TimetableAllDays()} {
+	for _, timetable := range []*gotado.ScheduleTimetable{zone.ScheduleMonToSun(), zone.ScheduleMonToFriSatSun(), zone.ScheduleAllDays()} {
 		fmt.Printf("%s (%d)\n", timetable.Type, timetable.ID)
 	}
-	activeTimetable, err := zone.GetActiveTimetable(ctx)
+	activeSchedule, err := zone.GetActiveScheduleTimetable(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get active heating schedule timetable: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("Active heating schedule timetable: %s (%d)\n", activeTimetable.Type, activeTimetable.ID)
+	fmt.Printf("Active heating schedule timetable: %s (%d)\n", activeSchedule.Type, activeSchedule.ID)
 
-	// Get and print schedule
-	schedule, err := activeTimetable.GetTimeBlocks(ctx)
+	// Get and print schedule time blocks
+	timeBlocks, err := activeSchedule.GetTimeBlocks(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get heating schedule: %v\n", err)
 		os.Exit(1)
 	}
 	fmt.Println("Heating schedule:")
-	for _, block := range schedule {
+	for _, block := range timeBlocks {
 		fmt.Printf("%s (%s - %s): %s %s", block.DayType, block.Start, block.End, block.Setting.Type, block.Setting.Power)
 		if block.Setting.Power == "ON" {
 			fmt.Printf(" (%.2f°C, %.2f°F)", block.Setting.Temperature.Celsius, block.Setting.Temperature.Fahrenheit)
@@ -84,8 +84,8 @@ func main() {
 	}
 
 	// Update schedule
-	newTimetable := zone.TimetableMonToSun()
-	newSchedule := []*gotado.ScheduleTimeBlock{
+	newSchedule := zone.ScheduleMonToSun()
+	newTimeBlocks := []*gotado.ScheduleTimeBlock{
 		{
 			DayType:             "MONDAY_TO_SUNDAY",
 			Start:               "00:00",
@@ -123,11 +123,11 @@ func main() {
 			},
 		},
 	}
-	if err := zone.SetActiveTimetable(ctx, newTimetable); err != nil {
+	if err := zone.SetActiveScheduleTimetable(ctx, newSchedule); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule timetable: %v\n", err)
 		os.Exit(1)
 	}
-	if err := newTimetable.SetTimeBlocks(ctx, newSchedule); err != nil {
+	if err := newSchedule.SetTimeBlocks(ctx, newTimeBlocks); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set heating schedule: %v\n", err)
 		os.Exit(1)
 	}
@@ -136,11 +136,11 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	// Restore original heating schedule
-	if err := zone.SetActiveTimetable(ctx, activeTimetable); err != nil {
+	if err := zone.SetActiveScheduleTimetable(ctx, activeSchedule); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule timetable: %v\n", err)
 		os.Exit(1)
 	}
-	if err := activeTimetable.SetTimeBlocks(ctx, schedule); err != nil {
+	if err := activeSchedule.SetTimeBlocks(ctx, timeBlocks); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set heating schedule: %v\n", err)
 		os.Exit(1)
 	}
