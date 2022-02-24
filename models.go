@@ -324,12 +324,24 @@ type WeatherMeasurement struct {
 	Value string `json:"value"`
 }
 
+// TimetableType specifies the type of a timetable
+type TimetableType string
+
+const (
+	// TimetableOneDay is a timetable type with a single schedule for all days
+	TimetableOneDay TimetableType = "ONE_DAY"
+	// TimetableThreeDay is a timetable type with a schedule for week days, saturdays and sundays
+	TimetableThreeDay TimetableType = "THREE_DAY"
+	// TimetableSevenDay is a timetable type with one schedule for each day
+	TimetableSevenDay TimetableType = "SEVEN_DAY"
+)
+
 // ScheduleTimetable is the type of a tado° schedule timetable
 type ScheduleTimetable struct {
 	client *client
 	zone   *Zone
-	ID     int32  `json:"id"`
-	Type   string `json:"type,omitempty"`
+	ID     int32         `json:"id"`
+	Type   TimetableType `json:"type,omitempty"`
 }
 
 // DayType specifies the type of day for a heating schedule block

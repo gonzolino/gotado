@@ -117,7 +117,7 @@ func (z *Zone) SetEarlyStart(ctx context.Context, earlyStart bool) error {
 }
 
 // newScheduleTimetable creates a new schedule timetable linked to the zone.
-func (z *Zone) newScheduleTimetable(id int32, typ string) *ScheduleTimetable {
+func (z *Zone) newScheduleTimetable(id int32, typ TimetableType) *ScheduleTimetable {
 	return &ScheduleTimetable{
 		client: z.client,
 		zone:   z,
@@ -128,18 +128,18 @@ func (z *Zone) newScheduleTimetable(id int32, typ string) *ScheduleTimetable {
 
 // ScheduleMonToSun has the same schedule for all days between monday and sunday.
 func (z *Zone) ScheduleMonToSun() *ScheduleTimetable {
-	return z.newScheduleTimetable(0, "ONE_DAY")
+	return z.newScheduleTimetable(0, TimetableOneDay)
 }
 
 // TimetableTMonToFriSatSun has the same schedule for all days between monday
 // and friday and different schedules for saturday and sunday.
 func (z *Zone) ScheduleMonToFriSatSun() *ScheduleTimetable {
-	return z.newScheduleTimetable(1, "THREE_DAY")
+	return z.newScheduleTimetable(1, TimetableThreeDay)
 }
 
 // ScheduleAllDays has a different schedule for each day of the week.
 func (z *Zone) ScheduleAllDays() *ScheduleTimetable {
-	return z.newScheduleTimetable(2, "SEVEN_DAY")
+	return z.newScheduleTimetable(2, TimetableSevenDay)
 }
 
 // GetActiveScheduleTimetable returns the active schedule timetable for the zone.
