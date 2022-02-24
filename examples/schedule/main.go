@@ -69,7 +69,7 @@ func main() {
 	fmt.Printf("Active heating schedule timetable: %s (%d)\n", activeTimetable.Type, activeTimetable.ID)
 
 	// Get and print schedule
-	schedule, err := activeTimetable.GetScheduleTimeBlocks(ctx)
+	schedule, err := activeTimetable.GetTimeBlocks(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get heating schedule: %v\n", err)
 		os.Exit(1)
@@ -127,7 +127,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule timetable: %v\n", err)
 		os.Exit(1)
 	}
-	if err := newTimetable.SetScheduleTimeBlocks(ctx, newSchedule); err != nil {
+	if err := newTimetable.SetTimeBlocks(ctx, newSchedule); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set heating schedule: %v\n", err)
 		os.Exit(1)
 	}
@@ -140,7 +140,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule timetable: %v\n", err)
 		os.Exit(1)
 	}
-	if err := activeTimetable.SetScheduleTimeBlocks(ctx, schedule); err != nil {
+	if err := activeTimetable.SetTimeBlocks(ctx, schedule); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set heating schedule: %v\n", err)
 		os.Exit(1)
 	}

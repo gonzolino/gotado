@@ -2,8 +2,8 @@ package gotado
 
 import "context"
 
-// GetScheduleTimeBlocks returns all time blocks of the timetable schedule.
-func (s *ScheduleTimetable) GetScheduleTimeBlocks(ctx context.Context) ([]*ScheduleTimeBlock, error) {
+// GetTimeBlocks returns all time blocks of the schedule.
+func (s *ScheduleTimetable) GetTimeBlocks(ctx context.Context) ([]*ScheduleTimeBlock, error) {
 	blocks := make([]*ScheduleTimeBlock, 0)
 	if err := s.client.get(ctx, apiURL("homes/%d/zones/%d/schedule/timetables/%d/blocks", s.zone.home.ID, s.zone.ID, s.ID), &blocks); err != nil {
 		return nil, err
@@ -11,16 +11,16 @@ func (s *ScheduleTimetable) GetScheduleTimeBlocks(ctx context.Context) ([]*Sched
 	return blocks, nil
 }
 
-// SetScheduleTimeBlocks updates the timetable schedule with the given time blocks.
-func (s *ScheduleTimetable) SetScheduleTimeBlocks(ctx context.Context, schedule []*ScheduleTimeBlock) error {
+// SetTimeBlocks updates the schedule with the given time blocks.
+func (s *ScheduleTimetable) SetTimeBlocks(ctx context.Context, blocks []*ScheduleTimeBlock) error {
 	// Order schedule blocks by day types.
 	// For each daytipe we want to send one put request.
 	scheduleMap := map[DayType][]*ScheduleTimeBlock{}
-	for _, scheduleBlock := range schedule {
-		if _, ok := scheduleMap[scheduleBlock.DayType]; !ok {
-			scheduleMap[scheduleBlock.DayType] = make([]*ScheduleTimeBlock, 0, 1)
+	for _, block := range blocks {
+		if _, ok := scheduleMap[block.DayType]; !ok {
+			scheduleMap[block.DayType] = make([]*ScheduleTimeBlock, 0, 1)
 		}
-		scheduleMap[scheduleBlock.DayType] = append(scheduleMap[scheduleBlock.DayType], scheduleBlock)
+		scheduleMap[block.DayType] = append(scheduleMap[block.DayType], block)
 	}
 
 	for dayType, scheduleBlocks := range scheduleMap {
