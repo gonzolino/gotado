@@ -57,25 +57,16 @@ func main() {
 	}
 
 	// Show schedule timetables
-	fmt.Println("Available heating schedule timetables:")
-	for _, timetable := range []*gotado.ScheduleTimetable{zone.ScheduleMonToSun(), zone.ScheduleMonToFriSatSun(), zone.ScheduleAllDays()} {
-		fmt.Printf("%s (%d)\n", timetable.Type, timetable.ID)
-	}
-	activeSchedule, err := zone.GetActiveScheduleTimetable(ctx)
+	activeSchedule, err := zone.GetHeatingSchedule(ctx)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to get active heating schedule timetable: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to get active heating schedule: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("Active heating schedule timetable: %s (%d)\n", activeSchedule.Type, activeSchedule.ID)
+	fmt.Printf("Active heating schedule days: %s\n", activeSchedule.ScheduleDays)
 
 	// Get and print schedule time blocks
-	timeBlocks, err := activeSchedule.GetTimeBlocks(ctx)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to get heating schedule: %v\n", err)
-		os.Exit(1)
-	}
 	fmt.Println("Heating schedule:")
-	for _, block := range timeBlocks {
+	for _, block := range activeSchedule.Blocks {
 		fmt.Printf("%s (%s - %s): %s %s", block.DayType, block.Start, block.End, block.Setting.Type, block.Setting.Power)
 		if block.Setting.Power == "ON" {
 			fmt.Printf(" (%.2f°C, %.2f°F)", block.Setting.Temperature.Celsius, block.Setting.Temperature.Fahrenheit)
@@ -84,51 +75,22 @@ func main() {
 	}
 
 	// Update schedule
-	newSchedule := zone.ScheduleMonToSun()
-	newTimeBlocks := []*gotado.ScheduleTimeBlock{
-		{
-			DayType:             "MONDAY_TO_SUNDAY",
-			Start:               "00:00",
-			End:                 "12:00",
-			GeolocationOverride: false,
-			Setting: &gotado.ZoneSetting{
-				Type:  "HEATING",
-				Power: "ON",
-				Temperature: &gotado.ZoneSettingTemperature{
-					Celsius: 18,
-				},
-			},
-		},
-		{
-			DayType:             "MONDAY_TO_SUNDAY",
-			Start:               "12:00",
-			End:                 "14:00",
-			GeolocationOverride: false,
-			Setting: &gotado.ZoneSetting{
-				Type:  "HEATING",
-				Power: "OFF",
-			},
-		},
-		{
-			DayType:             "MONDAY_TO_SUNDAY",
-			Start:               "14:00",
-			End:                 "00:00",
-			GeolocationOverride: false,
-			Setting: &gotado.ZoneSetting{
-				Type:  "HEATING",
-				Power: "ON",
-				Temperature: &gotado.ZoneSettingTemperature{
-					Celsius: 20,
-				},
-			},
-		},
-	}
-	if err := zone.SetActiveScheduleTimetable(ctx, newSchedule); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule timetable: %v\n", err)
+	newSchedule, err := zone.ScheduleMonToFriSatSun(ctx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to initialize new heating schedule: %v\n", err)
 		os.Exit(1)
 	}
-	if err := newSchedule.SetTimeBlocks(ctx, newTimeBlocks); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to set heating schedule: %v\n", err)
+
+	newSchedule = newSchedule.
+		NewTimeBlock(ctx, gotado.DayTypeMondayToFriday, "00:00", "07:00", true, gotado.PowerOff, 0.0).
+		AddTimeBlock(ctx, gotado.DayTypeMondayToFriday, "07:00", "00:00", false, gotado.PowerOn, 20.0).
+		AddTimeBlock(ctx, gotado.DayTypeSaturday, "00:00", "09:00", true, gotado.PowerOff, 0.0).
+		AddTimeBlock(ctx, gotado.DayTypeSaturday, "09:00", "00:00", false, gotado.PowerOn, 18.0).
+		AddTimeBlock(ctx, gotado.DayTypeSunday, "00:00", "09:00", true, gotado.PowerOff, 0.0).
+		AddTimeBlock(ctx, gotado.DayTypeSunday, "09:00", "00:00", false, gotado.PowerOn, 19.0)
+
+	if err := zone.SetHeatingSchedule(ctx, newSchedule); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -136,12 +98,8 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	// Restore original heating schedule
-	if err := zone.SetActiveScheduleTimetable(ctx, activeSchedule); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule timetable: %v\n", err)
-		os.Exit(1)
-	}
-	if err := activeSchedule.SetTimeBlocks(ctx, timeBlocks); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to set heating schedule: %v\n", err)
+	if err := zone.SetHeatingSchedule(ctx, activeSchedule); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to set active heating schedule: %v\n", err)
 		os.Exit(1)
 	}
 	fmt.Printf("Restored original heating schedule in home '%s', zone '%s'\n", home.Name, zone.Name)

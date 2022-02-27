@@ -368,6 +368,21 @@ type ScheduleTimeBlock struct {
 	Setting             *ZoneSetting `json:"setting"`
 }
 
+type ScheduleDays string
+
+const (
+	ScheduleDaysMonToSun              ScheduleDays = ScheduleDays(TimetableOneDay)
+	ScheduleDaysMonToFriSatSun        ScheduleDays = ScheduleDays(TimetableThreeDay)
+	ScheduleDaysMonTueWedThuFriSatSun ScheduleDays = ScheduleDays(TimetableSevenDay)
+)
+
+type HeatingSchedule struct {
+	zone         *Zone
+	ScheduleDays ScheduleDays
+	Timetable    *ScheduleTimetable
+	Blocks       []*ScheduleTimeBlock
+}
+
 // ComfortLevel defines how a zone is preheated before arrival
 type ComfortLevel int32
 

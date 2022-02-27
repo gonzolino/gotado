@@ -126,20 +126,47 @@ func (z *Zone) newScheduleTimetable(id int32, typ TimetableType) *ScheduleTimeta
 	}
 }
 
+// newHeatingSchedule creates a new heating schedule linked to the zone.
+func (z *Zone) newHeatingSchedule(timetable *ScheduleTimetable, blocks []*ScheduleTimeBlock) *HeatingSchedule {
+	return &HeatingSchedule{
+		zone:      z,
+		Timetable: timetable,
+		Blocks:    blocks,
+	}
+}
+
 // ScheduleMonToSun has the same schedule for all days between monday and sunday.
-func (z *Zone) ScheduleMonToSun() *ScheduleTimetable {
-	return z.newScheduleTimetable(0, TimetableOneDay)
+func (z *Zone) ScheduleMonToSun(ctx context.Context) (*HeatingSchedule, error) {
+	timetable := z.newScheduleTimetable(0, TimetableOneDay)
+	blocks, err := timetable.GetTimeBlocks(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get schedule time blocks: %w", err)
+	}
+
+	return z.newHeatingSchedule(timetable, blocks), nil
 }
 
 // TimetableTMonToFriSatSun has the same schedule for all days between monday
 // and friday and different schedules for saturday and sunday.
-func (z *Zone) ScheduleMonToFriSatSun() *ScheduleTimetable {
-	return z.newScheduleTimetable(1, TimetableThreeDay)
+func (z *Zone) ScheduleMonToFriSatSun(ctx context.Context) (*HeatingSchedule, error) {
+	timetable := z.newScheduleTimetable(1, TimetableThreeDay)
+	blocks, err := timetable.GetTimeBlocks(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get schedule time blocks: %w", err)
+	}
+
+	return z.newHeatingSchedule(timetable, blocks), nil
 }
 
 // ScheduleAllDays has a different schedule for each day of the week.
-func (z *Zone) ScheduleAllDays() *ScheduleTimetable {
-	return z.newScheduleTimetable(2, TimetableSevenDay)
+func (z *Zone) ScheduleAllDays(ctx context.Context) (*HeatingSchedule, error) {
+	timetable := z.newScheduleTimetable(2, TimetableSevenDay)
+	blocks, err := timetable.GetTimeBlocks(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get schedule time blocks: %w", err)
+	}
+
+	return z.newHeatingSchedule(timetable, blocks), nil
 }
 
 // GetActiveScheduleTimetable returns the active schedule timetable for the zone.
@@ -158,6 +185,48 @@ func (z *Zone) GetActiveScheduleTimetable(ctx context.Context) (*ScheduleTimetab
 func (z *Zone) SetActiveScheduleTimetable(ctx context.Context, timetable *ScheduleTimetable) error {
 	newTimetable := &ScheduleTimetable{ID: timetable.ID}
 	return z.client.put(ctx, apiURL("homes/%d/zones/%d/schedule/activeTimetable", z.home.ID, z.ID), newTimetable)
+}
+
+// GetHeatingSchedule gets the whole active schedule for the zone, including active timetable and time blocks.
+func (z *Zone) GetHeatingSchedule(ctx context.Context) (*HeatingSchedule, error) {
+	timetable, err := z.GetActiveScheduleTimetable(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get active schedule timetable: %w", err)
+	}
+	blocks, err := timetable.GetTimeBlocks(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("unable to get time blocks: %w", err)
+	}
+
+	var scheduleDays ScheduleDays
+	switch timetable.Type {
+	case TimetableOneDay:
+		scheduleDays = ScheduleDaysMonToSun
+	case TimetableThreeDay:
+		scheduleDays = ScheduleDaysMonToFriSatSun
+	case TimetableSevenDay:
+		scheduleDays = ScheduleDaysMonTueWedThuFriSatSun
+	default:
+		return nil, errors.New("unknown schedule timetable type")
+	}
+
+	return &HeatingSchedule{
+		zone:         z,
+		ScheduleDays: scheduleDays,
+		Timetable:    timetable,
+		Blocks:       blocks,
+	}, nil
+}
+
+// SetHeatingSchedule sets the whole active schedule for the zone, including active timetable and time blocks.
+func (z *Zone) SetHeatingSchedule(ctx context.Context, schedule *HeatingSchedule) error {
+	if err := z.SetActiveScheduleTimetable(ctx, schedule.Timetable); err != nil {
+		return fmt.Errorf("unable to set active schedule timetable: %w", err)
+	}
+	if err := schedule.Timetable.SetTimeBlocks(ctx, schedule.Blocks); err != nil {
+		return fmt.Errorf("unable to set time blocks: %w", err)
+	}
+	return nil
 }
 
 // GetAwayConfiguration returns the away configuration of the zone.

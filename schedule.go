@@ -1,6 +1,8 @@
 package gotado
 
-import "context"
+import (
+	"context"
+)
 
 // GetTimeBlocks returns all time blocks of the schedule.
 func (s *ScheduleTimetable) GetTimeBlocks(ctx context.Context) ([]*ScheduleTimeBlock, error) {
@@ -30,4 +32,41 @@ func (s *ScheduleTimetable) SetTimeBlocks(ctx context.Context, blocks []*Schedul
 	}
 
 	return nil
+}
+
+// NewTimeBlock resets the list of time blocks in the heating schedule and adds the given time block as the first new block.
+func (s *HeatingSchedule) NewTimeBlock(ctx context.Context, dayType DayType, start, end string, geolocationOverride bool, power Power, temperature float64) *HeatingSchedule {
+	s.Blocks = make([]*ScheduleTimeBlock, 0)
+	return s.AddTimeBlock(ctx, dayType, start, end, geolocationOverride, power, temperature)
+}
+
+// AddTimeBlock adds a time block to the heating schedule.
+// Start and end parameters define when the time blocks starts and ends and are
+// in the format HH:MM. GeolocationOverride specifies if the timeblock will
+// override geofencing control. Power defines if heating is powered on or off
+// and temperature specifies the temperature to heat to. Temperature is
+// interpreted in Celsius / Fahrenheit depending on the temperature unit
+// configured in the home.
+func (s *HeatingSchedule) AddTimeBlock(ctx context.Context, dayType DayType, start, end string, geolocationOverride bool, power Power, temperature float64) *HeatingSchedule {
+	temp := &ZoneSettingTemperature{}
+	switch s.zone.home.TemperatureUnit {
+	case TemperatureUnitCelsius:
+		temp.Celsius = temperature
+	case TemperatureUnitFahrenheit:
+		temp.Fahrenheit = temperature
+	}
+
+	block := &ScheduleTimeBlock{
+		DayType:             dayType,
+		Start:               start,
+		End:                 end,
+		GeolocationOverride: geolocationOverride,
+		Setting: &ZoneSetting{
+			Type:        ZoneTypeHeating,
+			Power:       power,
+			Temperature: temp,
+		},
+	}
+	s.Blocks = append(s.Blocks, block)
+	return s
 }
