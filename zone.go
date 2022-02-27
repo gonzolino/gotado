@@ -65,9 +65,9 @@ func (z *Zone) SetHeatingOff(ctx context.Context) error {
 func (z *Zone) SetHeatingOn(ctx context.Context, temperature float64) error {
 	temperatureSetting := &ZoneSettingTemperature{}
 	switch z.home.TemperatureUnit {
-	case "CELSIUS":
+	case TemperatureUnitCelsius:
 		temperatureSetting.Celsius = temperature
-	case "FAHRENHEIT":
+	case TemperatureUnitFahrenheit:
 		temperatureSetting.Fahrenheit = temperature
 	default:
 		return fmt.Errorf("invalid temperature unit '%s'", z.home.TemperatureUnit)
@@ -75,8 +75,8 @@ func (z *Zone) SetHeatingOn(ctx context.Context, temperature float64) error {
 
 	overlay := &ZoneOverlay{
 		Setting: &ZoneSetting{
-			Type:        "HEATING",
-			Power:       "ON",
+			Type:        ZoneTypeHeating,
+			Power:       PowerOn,
 			Temperature: temperatureSetting,
 		},
 	}
@@ -84,7 +84,7 @@ func (z *Zone) SetHeatingOn(ctx context.Context, temperature float64) error {
 		return err
 	}
 
-	if overlay.Type != "MANUAL" || overlay.Setting.Power != "ON" {
+	if overlay.Type != OverlayTypeManual || overlay.Setting.Power != PowerOn {
 		return errors.New("tado° refused to set the given temperature")
 	}
 
@@ -251,9 +251,9 @@ func (z *Zone) SetAwayMinimumTemperature(ctx context.Context, temperature float6
 	}
 
 	switch z.home.TemperatureUnit {
-	case "CELSIUS":
+	case TemperatureUnitCelsius:
 		awayConfig.Setting.Temperature.Celsius = temperature
-	case "FAHRENHEIT":
+	case TemperatureUnitFahrenheit:
 		awayConfig.Setting.Temperature.Fahrenheit = temperature
 	default:
 		return fmt.Errorf("invalid temperature unit '%s'", z.home.TemperatureUnit)
