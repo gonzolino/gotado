@@ -4,6 +4,7 @@ import "time"
 
 // User represents a tado° user
 type User struct {
+	client        *client
 	Name          string         `json:"name"`
 	Email         string         `json:"email"`
 	Username      string         `json:"username"`
@@ -29,6 +30,7 @@ const (
 
 // Home represents a home equipped with tado°
 type Home struct {
+	client                     *client
 	ID                         int32                 `json:"id"`
 	Name                       string                `json:"name"`
 	DateTimeZone               string                `json:"dateTimeZone"`
@@ -119,6 +121,8 @@ const (
 
 // Zone represents a tado° zone
 type Zone struct {
+	client              *client
+	home                *Home
 	ID                  int32                   `json:"id"`
 	Name                string                  `json:"name"`
 	Type                ZoneType                `json:"type"`
@@ -320,18 +324,24 @@ type WeatherMeasurement struct {
 	Value string `json:"value"`
 }
 
+// TimetableType specifies the type of a timetable
 type TimetableType string
 
 const (
-	TimetableTypeOneDay   TimetableType = "ONE_DAY"
-	TimetableTypeThreeDay TimetableType = "THREE_DAY"
-	TimetableTypeSevenDay TimetableType = "SEVEN_DAY"
+	// TimetableOneDay is a timetable type with a single schedule for all days
+	TimetableOneDay TimetableType = "ONE_DAY"
+	// TimetableThreeDay is a timetable type with a schedule for week days, saturdays and sundays
+	TimetableThreeDay TimetableType = "THREE_DAY"
+	// TimetableSevenDay is a timetable type with one schedule for each day
+	TimetableSevenDay TimetableType = "SEVEN_DAY"
 )
 
 // ScheduleTimetable is the type of a tado° schedule timetable
 type ScheduleTimetable struct {
-	ID   int32         `json:"id"`
-	Type TimetableType `json:"type,omitempty"`
+	client *client
+	zone   *Zone
+	ID     int32         `json:"id"`
+	Type   TimetableType `json:"type,omitempty"`
 }
 
 // DayType specifies the type of day for a heating schedule block
@@ -349,8 +359,8 @@ const (
 	DayTypeSunday         DayType = "SUNDAY"
 )
 
-// ScheduleBlock is a block in a tado° schedule
-type ScheduleBlock struct {
+// ScheduleTimeBlock is a block in a tado° schedule
+type ScheduleTimeBlock struct {
 	DayType             DayType      `json:"dayType"`
 	Start               string       `json:"start"`
 	End                 string       `json:"end"`
@@ -358,16 +368,31 @@ type ScheduleBlock struct {
 	Setting             *ZoneSetting `json:"setting"`
 }
 
+type ScheduleDays string
+
+const (
+	ScheduleDaysMonToSun              ScheduleDays = ScheduleDays(TimetableOneDay)
+	ScheduleDaysMonToFriSatSun        ScheduleDays = ScheduleDays(TimetableThreeDay)
+	ScheduleDaysMonTueWedThuFriSatSun ScheduleDays = ScheduleDays(TimetableSevenDay)
+)
+
+type HeatingSchedule struct {
+	zone         *Zone
+	ScheduleDays ScheduleDays
+	Timetable    *ScheduleTimetable
+	Blocks       []*ScheduleTimeBlock
+}
+
 // ComfortLevel defines how a zone is preheated before arrival
 type ComfortLevel int32
 
 const (
 	// ComfortLevelEco will not preheat the zone too early before arrival and only reach the target temperature after arrival
-	ComfortLevelEco = 0
+	ComfortLevelEco ComfortLevel = 0
 	// ComfortLevelBalance will find the best trade-off between comfort and savings
-	ComfortLevelBalance = 50
+	ComfortLevelBalance ComfortLevel = 50
 	// ComfortLevelComfort ensures that the desired home temperature is reached shortly before arrival
-	ComfortLevelComfort = 100
+	ComfortLevelComfort ComfortLevel = 100
 )
 
 // AwayConfiguration holds the settings to use when everybody leaves the house
@@ -398,6 +423,7 @@ type Weather struct {
 
 // Device represents a tado° device such as a thermostat or a bridge
 type Device struct {
+	client           *client
 	DeviceType       DeviceType            `json:"deviceType"`
 	SerialNo         string                `json:"serialNo"`
 	ShortSerialNo    string                `json:"shortSerialNo"`
@@ -440,6 +466,8 @@ type Installation struct {
 
 // MobileDevice represents a mobile device with the tado° app installed
 type MobileDevice struct {
+	client         *client
+	home           *Home
 	Name           string                `json:"name"`
 	ID             int32                 `json:"id"`
 	Settings       MobileDeviceSettings  `json:"settings"`

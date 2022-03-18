@@ -3,9 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
-	"time"
 
 	"github.com/gonzolino/gotado"
 )
@@ -29,18 +27,10 @@ func main() {
 	}
 
 	ctx := context.Background()
-
-	// Create authenticated tado° client
-	httpClient := &http.Client{Timeout: 5 * time.Second}
-	client := gotado.NewClient(clientID, clientSecret).WithHTTPClient(httpClient)
-	client, err := client.WithCredentials(ctx, username, password)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Authentication failed: %v\n", err)
-		os.Exit(1)
-	}
+	tado := gotado.New(clientID, clientSecret)
 
 	// Get user info and print some details
-	user, err := gotado.GetMe(client)
+	user, err := tado.Me(ctx, username, password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get user info: %v\n", err)
 		os.Exit(1)
@@ -49,7 +39,7 @@ func main() {
 
 	// for each home: get home info and print name and address
 	for _, userHome := range user.Homes {
-		home, err := gotado.GetHome(client, &userHome)
+		home, err := user.GetHome(ctx, userHome.Name)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to get user home info: %v\n", err)
 			os.Exit(1)

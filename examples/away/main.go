@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
 	"time"
 
@@ -35,55 +34,30 @@ func main() {
 	homeName, zoneName := os.Args[1], os.Args[2]
 
 	ctx := context.Background()
+	tado := gotado.New(clientID, clientSecret)
 
-	// Create authenticated tado° client
-	httpClient := &http.Client{Timeout: 5 * time.Second}
-	client := gotado.NewClient(clientID, clientSecret).WithHTTPClient(httpClient)
-	client, err := client.WithCredentials(ctx, username, password)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Authentication failed: %v\n", err)
-		os.Exit(1)
-	}
-
-	user, err := gotado.GetMe(client)
+	user, err := tado.Me(ctx, username, password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get user info: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Find the home to control
-	var home *gotado.UserHome
-	for _, h := range user.Homes {
-		if h.Name == homeName {
-			home = &h
-			break
-		}
-	}
-	if home == nil {
-		fmt.Fprintf(os.Stderr, "Home '%s' not found\n", homeName)
+	home, err := user.GetHome(ctx, homeName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to find home '%s': %v\n", homeName, err)
 		os.Exit(1)
 	}
 
 	// Find zone to control
-	zones, err := gotado.GetZones(client, home)
+	zone, err := home.GetZone(ctx, zoneName)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to get zones: %v\n", err)
-		os.Exit(1)
-	}
-	var zone *gotado.Zone
-	for _, z := range zones {
-		if z.Name == zoneName {
-			zone = z
-			break
-		}
-	}
-	if zone == nil {
-		fmt.Fprintf(os.Stderr, "Zone '%s' not found\n", zoneName)
+		fmt.Fprintf(os.Stderr, "Failed to find zone '%s': %v\n", zoneName, err)
 		os.Exit(1)
 	}
 
 	// Show away configuration
-	awayConfig, err := gotado.GetAwayConfiguration(client, home, zone)
+	awayConfig, err := zone.GetAwayConfiguration(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get away configuration: %v\n", err)
 		os.Exit(1)
@@ -91,12 +65,11 @@ func main() {
 	fmt.Println("Away Configuration:")
 	if awayConfig.AutoAdjust {
 		fmt.Printf("Comfort Level: %d\n", awayConfig.ComfortLevel)
-	} else {
 		fmt.Printf("Temperature: %.2f C°, %.2f F°\n", awayConfig.Setting.Temperature.Celsius, awayConfig.Setting.Temperature.Fahrenheit)
 	}
 
 	// Update comfort level
-	err = gotado.SetAwayComfortLevel(client, home, zone, 0)
+	err = zone.SetAwayPreheatComfortLevel(ctx, gotado.ComfortLevelEco)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get set comfort level: %v\n", err)
 		os.Exit(1)
@@ -106,7 +79,7 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	// Restore original away configuration
-	if err := gotado.SetAwayConfiguration(client, home, zone, awayConfig); err != nil {
+	if err := zone.SetAwayConfiguration(ctx, awayConfig); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to set away configuration: %v\n", err)
 		os.Exit(1)
 	}

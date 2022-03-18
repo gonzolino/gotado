@@ -3,9 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"os"
-	"time"
 
 	"github.com/gonzolino/gotado"
 )
@@ -35,37 +33,23 @@ func main() {
 	homeName := os.Args[1]
 
 	ctx := context.Background()
+	tado := gotado.New(clientID, clientSecret)
 
-	// Create authenticated tado° client
-	httpClient := &http.Client{Timeout: 5 * time.Second}
-	client := gotado.NewClient(clientID, clientSecret).WithHTTPClient(httpClient)
-	client, err := client.WithCredentials(ctx, username, password)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Authentication failed: %v\n", err)
-		os.Exit(1)
-	}
-
-	user, err := gotado.GetMe(client)
+	user, err := tado.Me(ctx, username, password)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get user info: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Find the home to control
-	var home *gotado.UserHome
-	for _, h := range user.Homes {
-		if h.Name == homeName {
-			home = &h
-			break
-		}
-	}
-	if home == nil {
-		fmt.Fprintf(os.Stderr, "Home '%s' not found\n", homeName)
+	home, err := user.GetHome(ctx, homeName)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to find home '%s': %v\n", homeName, err)
 		os.Exit(1)
 	}
 
 	// Get weather
-	weather, err := gotado.GetWeather(client, home)
+	weather, err := home.GetWeather(ctx)
 	fmt.Println("Weather:")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get weather: %v\n", err)
@@ -76,7 +60,7 @@ func main() {
 	fmt.Printf("Weather State: %s\n", weather.WeatherState.Value)
 
 	// Get Devices
-	devices, err := gotado.GetDevices(client, home)
+	devices, err := home.GetDevices(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get devices: %v\n", err)
 		os.Exit(1)
@@ -87,7 +71,7 @@ func main() {
 	}
 
 	// Get Installations
-	installations, err := gotado.GetInstallations(client, home)
+	installations, err := home.GetInstallations(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get installations: %v\n", err)
 		os.Exit(1)
@@ -98,7 +82,7 @@ func main() {
 	}
 
 	// Get mobile Devices
-	mobileDevices, err := gotado.GetMobileDevices(client, home)
+	mobileDevices, err := home.GetMobileDevices(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get mobile devices: %v\n", err)
 		os.Exit(1)
@@ -113,7 +97,7 @@ func main() {
 	}
 
 	// Get Users
-	users, err := gotado.GetUsers(client, home)
+	users, err := home.GetUsers(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get users: %v\n", err)
 		os.Exit(1)
