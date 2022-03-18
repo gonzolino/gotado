@@ -47,7 +47,7 @@ func (s *HeatingSchedule) NewTimeBlock(ctx context.Context, dayType DayType, sta
 // and temperature specifies the temperature to heat to. Temperature is
 // interpreted in Celsius / Fahrenheit depending on the temperature unit
 // configured in the home.
-func (s *HeatingSchedule) AddTimeBlock(ctx context.Context, dayType DayType, start, end string, geolocationOverride bool, power Power, temperature float64) *HeatingSchedule {
+func (s *HeatingSchedule) AddTimeBlock(_ context.Context, dayType DayType, start, end string, geolocationOverride bool, power Power, temperature float64) *HeatingSchedule {
 	temp := &ZoneSettingTemperature{}
 	switch s.zone.home.TemperatureUnit {
 	case TemperatureUnitCelsius:
