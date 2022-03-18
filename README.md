@@ -20,21 +20,21 @@ Then you can import `"github.com/gonzolino/gotado"` in your packages. Have a loo
 
 Besides your tado° username and password you need a `clientId` and `clientSecret` to authenticate with the tado° API. One way to get those is to grab them from <https://my.tado.com/webapp/env.js>.
 
-### Code Examples
+### Getting Started
 
-Get started by creating an authenticated client object:
+Get started by creating a client object:
 
 ```golang
-client, err := gotado.NewClient("cliendId", "clientSecret").WithCredentials(context.TODO(), "username", "password")
+tado := gotado.New("cliendId", "clientSecret")
 ```
 
-With the client you can start using the gotado functions:
+With the client you can authenticate and start using the gotado functions:
 
 ```golang
-user, err := gotado.GetMe(client)
-fmt.Printf("User Email: %s\n", user.Email)
+me, err := tado.Me(ctx, "username", "password")
+fmt.Printf("User Email: %s\n", me.Email)
 
-home, err := gotado.GetHome(client, &user.Homes[0])
+home, err := me.GetHome(client, "My Home Name")
 fmt.Printf("Home Address:\n%s\n%s %s\n", *home.Address.AddressLine1, *home.Address.ZipCode, *home.Address.City)
 ```
 
