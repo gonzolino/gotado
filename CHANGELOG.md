@@ -1,5 +1,14 @@
 # Changelog
 
+### [2.0.1](https://github.com/gonzolino/gotado/compare/v2.0.0...v2.0.1) (2022-04-13)
+
+
+### Bug Fixes
+
+* Do not crash in away example if away config has no settings ([4d393d3](https://github.com/gonzolino/gotado/commit/4d393d35f6adf42657d8f93d1f2ef094a94535e3))
+* fix import path in examples and client ([2237c40](https://github.com/gonzolino/gotado/commit/2237c400b659c331d1d209fd21b559d4d9c07362))
+* Set correct v2 module path ([ffafc4f](https://github.com/gonzolino/gotado/commit/ffafc4f1f69cda16b47f73d0a17656b37479d084))
+
 ## [2.0.0](https://github.com/gonzolino/gotado/compare/v1.0.0...v2.0.0) (2022-04-13)
 
 
