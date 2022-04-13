@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/gonzolino/gotado"
+	"github.com/gonzolino/gotado/v2"
 )
 
 const (

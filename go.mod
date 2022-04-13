@@ -1,4 +1,4 @@
-module github.com/gonzolino/gotado
+module github.com/gonzolino/gotado/v2
 
 go 1.18
 

@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"reflect"
 
-	oauth2int "github.com/gonzolino/gotado/internal/oauth2"
+	oauth2int "github.com/gonzolino/gotado/v2/internal/oauth2"
 	"golang.org/x/oauth2"
 )
 
