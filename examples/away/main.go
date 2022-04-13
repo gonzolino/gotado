@@ -65,7 +65,10 @@ func main() {
 	fmt.Println("Away Configuration:")
 	if awayConfig.AutoAdjust {
 		fmt.Printf("Comfort Level: %d\n", awayConfig.ComfortLevel)
-		fmt.Printf("Temperature: %.2f C°, %.2f F°\n", awayConfig.Setting.Temperature.Celsius, awayConfig.Setting.Temperature.Fahrenheit)
+
+		if awayConfig.Setting != nil {
+			fmt.Printf("Temperature: %.2f C°, %.2f F°\n", awayConfig.Setting.Temperature.Celsius, awayConfig.Setting.Temperature.Fahrenheit)
+		}
 	}
 
 	// Update comfort level
