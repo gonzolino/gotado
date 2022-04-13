@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	oauth2int "github.com/gonzolino/gotado/internal/oauth2"
+	oauth2int "github.com/gonzolino/gotado/v2/internal/oauth2"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 )
