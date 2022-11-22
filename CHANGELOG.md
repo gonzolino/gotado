@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.2](https://github.com/gonzolino/gotado/compare/v2.0.1...v2.0.2) (2022-11-22)
+
+
+### Bug Fixes
+
+* Do not set temperature when heating is off ([e31e791](https://github.com/gonzolino/gotado/commit/e31e791a6ba2e1118c27f2f64c4f4187036c4755))
+
 ### [2.0.1](https://github.com/gonzolino/gotado/compare/v2.0.0...v2.0.1) (2022-04-13)
 
 
