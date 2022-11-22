@@ -48,12 +48,18 @@ func (s *HeatingSchedule) NewTimeBlock(ctx context.Context, dayType DayType, sta
 // interpreted in Celsius / Fahrenheit depending on the temperature unit
 // configured in the home.
 func (s *HeatingSchedule) AddTimeBlock(_ context.Context, dayType DayType, start, end string, geolocationOverride bool, power Power, temperature float64) *HeatingSchedule {
-	temp := &ZoneSettingTemperature{}
-	switch s.zone.home.TemperatureUnit {
-	case TemperatureUnitCelsius:
-		temp.Celsius = temperature
-	case TemperatureUnitFahrenheit:
-		temp.Fahrenheit = temperature
+	var temp *ZoneSettingTemperature = nil
+
+	// Only set temperature if power is on.
+	// If power is off, the temperature should be null
+	if power == PowerOn {
+		temp = &ZoneSettingTemperature{}
+		switch s.zone.home.TemperatureUnit {
+		case TemperatureUnitCelsius:
+			temp.Celsius = temperature
+		case TemperatureUnitFahrenheit:
+			temp.Fahrenheit = temperature
+		}
 	}
 
 	block := &ScheduleTimeBlock{
