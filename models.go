@@ -187,6 +187,7 @@ type ZoneState struct {
 	OverlayType                    *OverlayType                  `json:"overlayType"`
 	Overlay                        *ZoneOverlay                  `json:"overlay"`
 	OpenWindow                     *ZoneStateOpenWindow          `json:"openWindow"`
+	OpenWindowDetected             bool                          `json:"openWindowDetected"`
 	NextScheduledChange            *ZoneStateNextScheduledChange `json:"nextScheduleChange"`
 	NextTimeBlock                  *ZoneStateNextTimeBlock       `json:"nextTimeBlock"`
 	Link                           ZoneStateLink                 `json:"link"`
