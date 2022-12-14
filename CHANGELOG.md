@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.3](https://github.com/gonzolino/gotado/compare/v2.0.2...v2.0.3) (2022-12-13)
+
+
+### Bug Fixes
+
+* add missing property in zonestates ([99601df](https://github.com/gonzolino/gotado/commit/99601df66af2d1575ff2bc44a94160473a6593d4))
+
 ## [2.0.2](https://github.com/gonzolino/gotado/compare/v2.0.1...v2.0.2) (2022-11-22)
 
 
