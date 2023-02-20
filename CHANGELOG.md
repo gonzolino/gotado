@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.4](https://github.com/gonzolino/gotado/compare/v2.0.3...v2.0.4) (2023-02-20)
+
+
+### Bug Fixes
+
+* Update dependencies to fix CVE-2022-27664 ([d5f65f5](https://github.com/gonzolino/gotado/commit/d5f65f569a119743ca8c6d9ccd67f8036af22a0a))
+
 ## [2.0.3](https://github.com/gonzolino/gotado/compare/v2.0.2...v2.0.3) (2022-12-13)
 
 
