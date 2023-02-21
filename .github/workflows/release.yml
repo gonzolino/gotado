@@ -6,12 +6,32 @@ on:
       - main
 
 jobs:
-  release:
+  release-please:
     name: Release Please
+    outputs:
+      release_created: ${{ steps.release-please.outputs.release_created }}
     runs-on: ubuntu-latest
     steps:
-      - uses: GoogleCloudPlatform/release-please-action@v3
+      - id: release-please
+        uses: google-github-actions/release-please-action@v3.7.4
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           release-type: go
           package-name: gotado
+  label:
+    if: ${{ needs.release-please.outputs.release_created }}
+    name: Label PR
+    needs: deploy
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - name: Get PR number
+        id: pr
+        run: |
+          echo "pr_number=$(gh pr list --state merged --label 'autorelease: tagged' --json number --jq '.[0].number')" >> $GITHUB_OUTPUT
+      - run: "gh pr edit ${{ steps.pr.outputs.pr_number }} --remove-label 'autorelease: tagged'"
+      - run: "gh pr edit ${{ steps.pr.outputs.pr_number }} --add-label 'autorelease: published'"
