@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.5](https://github.com/gonzolino/gotado/compare/v2.0.4...v2.0.5) (2023-02-21)
+
+
+### Bug Fixes
+
+* Set 'autorelease: published' label after release ([9c252fb](https://github.com/gonzolino/gotado/commit/9c252fbbde3322cbae10846a3f2cab4a9624bece))
+* Set correct dependency between release and label jobs ([da3b7fa](https://github.com/gonzolino/gotado/commit/da3b7fa0427c59efc4cd4bf8ab1b0c675418eeb1))
+
 ## [2.0.4](https://github.com/gonzolino/gotado/compare/v2.0.3...v2.0.4) (2023-02-20)
 
 
