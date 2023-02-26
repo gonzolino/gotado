@@ -425,6 +425,7 @@ type Weather struct {
 // Device represents a tado° device such as a thermostat or a bridge
 type Device struct {
 	client           *client
+	home             *Home
 	DeviceType       DeviceType            `json:"deviceType"`
 	SerialNo         string                `json:"serialNo"`
 	ShortSerialNo    string                `json:"shortSerialNo"`
