@@ -57,6 +57,7 @@ func (h *Home) GetDevices(ctx context.Context) ([]*Device, error) {
 	}
 	for _, device := range devices {
 		device.client = h.client
+		device.home = h
 	}
 	return devices, nil
 }

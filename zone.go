@@ -32,6 +32,7 @@ func (z *Zone) GetDevices(ctx context.Context) ([]*Device, error) {
 	}
 	for _, device := range devices {
 		device.client = z.client
+		device.home = z.home
 	}
 	return devices, nil
 }
