@@ -103,6 +103,31 @@ func (z *Zone) CloseWindow(ctx context.Context) error {
 	return z.client.delete(ctx, apiURL("homes/%d/zones/%d/state/openWindow", z.home.ID, z.ID))
 }
 
+// EnableOpenWindowDetection enable open window detection with the given heating timeout
+// duration in seconds after an open window has been detected.
+func (z *Zone) EnableOpenWindowDetection(ctx context.Context, timeout int32) error {
+	return z.client.put(ctx, apiURL("homes/%d/zones/%d/openWindowDetection", z.home.ID, z.ID), OpenWindowDetection{Enabled: true, TimeoutInSeconds: timeout})
+}
+
+// DisableOpenWindowDetection disable open window detection.
+func (z *Zone) DisableOpenWindowDetection(ctx context.Context) error {
+	return z.client.put(ctx, apiURL("homes/%d/zones/%d/openWindowDetection", z.home.ID, z.ID), OpenWindowDetection{Enabled: false})
+}
+
+// GetOpenWindowDetection returns the current open window detection settings.
+func (z *Zone) GetOpenWindowDetection(ctx context.Context) (*OpenWindowDetection, error) {
+	// Get fresh zone object to ensure that the returned settings are up to date.
+	zone, err := z.home.GetZone(ctx, z.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &OpenWindowDetection{
+		Enabled:          zone.OpenWindowDetection.Enabled,
+		TimeoutInSeconds: zone.OpenWindowDetection.TimeoutInSeconds,
+	}, nil
+}
+
 // GetEarlyStart checks if early start is enabled in the zone.
 func (z *Zone) GetEarlyStart(ctx context.Context) (bool, error) {
 	earlyStart := &EarlyStart{}
