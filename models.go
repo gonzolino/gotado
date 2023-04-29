@@ -415,6 +415,13 @@ type EarlyStart struct {
 	Enabled bool `json:"enabled"`
 }
 
+// OpenWindowDetection controls whether open window detection is enabled or not,
+// and how long to shut off the heating after a window has been opened.
+type OpenWindowDetection struct {
+	Enabled          bool  `json:"enabled"`
+	TimeoutInSeconds int32 `json:"timeoutInSeconds,omitempty"`
+}
+
 // Weather holds weather information from the home's location
 type Weather struct {
 	SolarIntensity     *PercentageMeasurement  `json:"solarIntensity"`
