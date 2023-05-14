@@ -128,6 +128,27 @@ func (z *Zone) GetOpenWindowDetection(ctx context.Context) (*OpenWindowDetection
 	}, nil
 }
 
+// EnableDazzleMode enables dazzle mode in the zone.
+func (z *Zone) EnableDazzleMode(ctx context.Context) error {
+	return z.client.put(ctx, apiURL("homes/%d/zones/%d/dazzle", z.home.ID, z.ID), DazzleMode{Enabled: true})
+}
+
+// DisableDazzleMode disables dazzle mode in the zone.
+func (z *Zone) DisableDazzleMode(ctx context.Context) error {
+	return z.client.put(ctx, apiURL("homes/%d/zones/%d/dazzle", z.home.ID, z.ID), DazzleMode{Enabled: false})
+}
+
+// GetDazzleMode returns the current dazzle mode settings.
+func (z *Zone) GetDazzleMode(ctx context.Context) (*ZoneDazzleMode, error) {
+	// Get fresh zone object to ensure that the returned settings are up to date.
+	zone, err := z.home.GetZone(ctx, z.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &zone.DazzleMode, nil
+}
+
 // GetEarlyStart checks if early start is enabled in the zone.
 func (z *Zone) GetEarlyStart(ctx context.Context) (bool, error) {
 	earlyStart := &EarlyStart{}

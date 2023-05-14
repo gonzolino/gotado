@@ -422,6 +422,11 @@ type OpenWindowDetection struct {
 	TimeoutInSeconds int32 `json:"timeoutInSeconds,omitempty"`
 }
 
+// DazzleMode controls whether dazzle mode is enabled or not.
+type DazzleMode struct {
+	Enabled bool `json:"enabled"`
+}
+
 // Weather holds weather information from the home's location
 type Weather struct {
 	SolarIntensity     *PercentageMeasurement  `json:"solarIntensity"`
