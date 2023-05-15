@@ -92,6 +92,50 @@ func (z *Zone) SetHeatingOn(ctx context.Context, temperature float64) error {
 	return nil
 }
 
+// GetManualControlTerminationCondition returns the condition how long manual
+// control in the zone will remain active after a tado° device was controlled
+// manually.
+func (z *Zone) GetManualControlTerminationCondition(ctx context.Context) (*ZoneOverlayTermination, error) {
+	defaultOverlay := &ZoneDefaultOverlay{}
+	if err := z.client.get(ctx, apiURL("homes/%d/zones/%d/defaultOverlay", z.home.ID, z.ID), defaultOverlay); err != nil {
+		return nil, err
+	}
+
+	return defaultOverlay.TerminationCondition, nil
+}
+
+// SetManualControlTerminationCondition sets the given manual control termination condition.
+// Possible types for the condition are "MANUAL" (Until ended by user), "TIMER"
+// and "TADO_MODE" (Until next automatic change).
+func (z *Zone) SetManualControlTerminationCondition(ctx context.Context, condition *ZoneOverlayTermination) error {
+	defaultOverlay := &ZoneDefaultOverlay{
+		TerminationCondition: condition,
+	}
+
+	if err := z.client.put(ctx, apiURL("homes/%d/zones/%d/defaultOverlay", z.home.ID, z.ID), defaultOverlay); err != nil {
+		return err
+	}
+	return nil
+}
+
+// ManualControlUntilAutoChange ensures that manual control of the zone remains
+// active until the next automatic change in the tado° schedule.
+func (z *Zone) ManualControlUntilAutoChange(ctx context.Context) error {
+	return z.SetManualControlTerminationCondition(ctx, &ZoneOverlayTermination{Type: OverlayTypeAuto})
+}
+
+// ManualControlTimer ensures that manual control of the zone remains active for
+// the given duration in seconds.
+func (z *Zone) ManualControlTimer(ctx context.Context, duration int32) error {
+	return z.SetManualControlTerminationCondition(ctx, &ZoneOverlayTermination{Type: OverlayTypeTimer, DurationInSeconds: duration})
+}
+
+// ManualControlUntilUserEnd ensures that manual control of the zone remains
+// active until ended by the user.
+func (z *Zone) ManualControlUntilUserEnd(ctx context.Context) error {
+	return z.SetManualControlTerminationCondition(ctx, &ZoneOverlayTermination{Type: OverlayTypeManual})
+}
+
 // OpenWindow puts the zone into open window mode (open window must have been
 // detected by tado° beforehand).
 func (z *Zone) OpenWindow(ctx context.Context) error {
