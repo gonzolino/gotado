@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type apiErrors struct {
@@ -26,7 +29,7 @@ type apiError struct {
 }
 
 func (e *apiError) Error() string {
-	return fmt.Sprintf("%s: %s", strings.Title(e.Code), e.Title)
+	return fmt.Sprintf("%s: %s", cases.Title(language.Und).String(e.Code), e.Title)
 }
 
 func isError(resp *http.Response) error {
