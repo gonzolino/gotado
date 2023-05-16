@@ -175,7 +175,12 @@ type ZoneCapabilitiesTemperatureValues struct {
 type OverlayType string
 
 const (
+	// OverlayTypeManual remains active until ended by user
 	OverlayTypeManual OverlayType = "MANUAL"
+	// OverlayTypeAuto remains active until next automatic change
+	OverlayTypeAuto OverlayType = "TADO_MODE"
+	// OverlayTypeTimer remains active for a given duration
+	OverlayTypeTimer OverlayType = "TIMER"
 )
 
 // ZoneState represents the state of a tado° zone
@@ -225,12 +230,17 @@ type ZoneOverlay struct {
 
 // ZoneOverlayTermination holdes the termination information of a zone overlay
 type ZoneOverlayTermination struct {
-	Type                   string  `json:"type"`
-	TypeSkillBasedApp      string  `json:"typeSkillBasedApp"`
-	DurationInSeconds      int32   `json:"durationInSeconds,omitempty"`
-	Expiry                 string  `json:"expiry,omitempty"`
-	RemainingTimeInSeconds int32   `json:"remainingTimeInSeconds,omitempty"`
-	ProjectedExpiry        *string `json:"projectedExpiry"`
+	Type                   OverlayType `json:"type"`
+	TypeSkillBasedApp      string      `json:"typeSkillBasedApp,omitempty"`
+	DurationInSeconds      int32       `json:"durationInSeconds,omitempty"`
+	Expiry                 string      `json:"expiry,omitempty"`
+	RemainingTimeInSeconds int32       `json:"remainingTimeInSeconds,omitempty"`
+	ProjectedExpiry        *string     `json:"projectedExpiry,omitempty"`
+}
+
+// ZoneDefaultOverlay holds the default overlay information of a zone
+type ZoneDefaultOverlay struct {
+	TerminationCondition *ZoneOverlayTermination `json:"terminationCondition"`
 }
 
 // ZoneStateOpenWindow holds the information about an open window of a zone state
