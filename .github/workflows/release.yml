@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: release-please
-        uses: google-github-actions/release-please-action@v3.7.10
+        uses: google-github-actions/release-please-action@v3.7.11
         with:
           token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           release-type: go
