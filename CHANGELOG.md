@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.0](https://github.com/gonzolino/gotado/compare/v2.0.5...v2.1.0) (2023-08-07)
+
+
+### Features
+
+* Add support to configure default overlay (manual control) ([20569fd](https://github.com/gonzolino/gotado/commit/20569fd96f0c35fa7ef1d607bafe571e852ec170))
+* Add support to enable/disable dazzle mode ([352f9fc](https://github.com/gonzolino/gotado/commit/352f9fcada25ea71c4c2e2de2ba7cbf6946d4dea))
+* Add support to enable/disable open window detection ([f3d4598](https://github.com/gonzolino/gotado/commit/f3d4598b1c159f6e69168e68629e1f481432d5ca))
+* Allow setting temperature offset for a device ([767d6d0](https://github.com/gonzolino/gotado/commit/767d6d03f24544541eef68ad6495965dd7ae704d))
+
 ## [2.0.5](https://github.com/gonzolino/gotado/compare/v2.0.4...v2.0.5) (2023-02-21)
 
 
