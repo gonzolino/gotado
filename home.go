@@ -40,6 +40,15 @@ func (h *Home) GetZone(ctx context.Context, name string) (*Zone, error) {
 	return nil, fmt.Errorf("unknown zone name '%s'", name)
 }
 
+// GetZoneStates returns information abaut the states of all zones in the home
+func (h *Home) GetZoneStates(ctx context.Context) (*ZoneStates, error) {
+	zoneStates := &ZoneStates{}
+	if err := h.client.get(ctx, apiURL("homes/%d/zoneStates", h.ID), &zoneStates); err != nil {
+		return nil, err
+	}
+	return zoneStates, nil
+}
+
 // GetWeather returns weather information at the homes location
 func (h *Home) GetWeather(ctx context.Context) (*Weather, error) {
 	weather := &Weather{}

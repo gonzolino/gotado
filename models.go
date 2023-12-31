@@ -200,6 +200,10 @@ type ZoneState struct {
 	SensorDataPoints               *ZoneStateSensorDataPoints    `json:"sensorDataPoints"`
 }
 
+type ZoneStates struct {
+	ZoneStates map[int32]*ZoneState `json:"zoneStates"`
+}
+
 // Power specifies is something is powered on or off
 type Power string
 
