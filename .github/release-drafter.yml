@@ -1,0 +1,20 @@
+name-template: v$RESOLVED_VERSION
+tag-template: v$RESOLVED_VERSION
+
+version-resolver:
+  major:
+    labels:
+      - breaking
+  minor:
+    labels:
+      - enhancement
+  patch:
+    labels:
+      - bug
+      - dependencies
+  default: minor
+
+template: |
+  ## What’s Changed
+
+  $CHANGES
