@@ -1,6 +1,6 @@
 module github.com/gonzolino/gotado/v2
 
-go 1.20
+go 1.24.1
 
 require (
 	github.com/golang/mock v1.6.0
