@@ -10,23 +10,10 @@ import (
 )
 
 const (
-	clientID     = "tado-web-app"
-	clientSecret = "wZaRN7rpjn3FoNyF5IFuxg9uMzYJcvOoQ8QWiIqS3hfk6gLhVlG57j5YNoZL2Rtc"
+	clientID = "1bb50063-6b0c-4d11-bd99-387f4a91cc46"
 )
 
 func main() {
-	// Get credentials from env vars
-	username, ok := os.LookupEnv("TADO_USERNAME")
-	if !ok {
-		fmt.Fprintf(os.Stderr, "Variable TADO_USERNAME not set\n")
-		os.Exit(1)
-	}
-	password, ok := os.LookupEnv("TADO_PASSWORD")
-	if !ok {
-		fmt.Fprintf(os.Stderr, "Variable TADO_PASSWORD not set\n")
-		os.Exit(1)
-	}
-
 	if len(os.Args) != 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s homeName zoneName\n", os.Args[0])
 		os.Exit(1)
@@ -34,9 +21,29 @@ func main() {
 	homeName, zoneName := os.Args[1], os.Args[2]
 
 	ctx := context.Background()
-	tado := gotado.New(clientID, clientSecret)
 
-	user, err := tado.Me(ctx, username, password)
+	// Authenticate to tado
+	// (see https://support.tado.com/en/articles/8565472-how-do-i-authenticate-to-access-the-rest-api)
+	config := gotado.AuthConfig(clientID)
+	response, err := config.DeviceAuth(ctx)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to obtain device authorization: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("To authenticate, visit %s\n", response.VerificationURIComplete)
+
+	token, err := config.DeviceAccessToken(ctx, response)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to obtain access token: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Create client
+	tado := gotado.New(ctx, config, token)
+
+	// Get user info
+	user, err := tado.Me(ctx)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to get user info: %v\n", err)
 		os.Exit(1)

@@ -1,34 +1,40 @@
 package gotado
 
-import "context"
+import (
+	"context"
+
+	"golang.org/x/oauth2"
+)
+
+var Endpoint = oauth2.Endpoint{
+	AuthURL:       "https://login.tado.com/oauth2/authorize",
+	TokenURL:      "https://login.tado.com/oauth2/token",
+	DeviceAuthURL: "https://login.tado.com/oauth2/device_authorize",
+}
 
 type Tado struct {
 	client *client
 }
 
+// AuthConfig creates a new OAuth2 config to be used for authentication with the tado° API.
+// Add `"offline_access"` as a scope if you need a refresh token that can be used to regularly create new access tokens.
+func AuthConfig(clientID string, scopes ...string) *oauth2.Config {
+	return &oauth2.Config{
+		ClientID: clientID,
+		Endpoint: Endpoint,
+		Scopes:   scopes,
+	}
+}
+
 // New creates a new tado client.
-func New(clientID, clientSecret string) *Tado {
+func New(ctx context.Context, config *oauth2.Config, token *oauth2.Token) *Tado {
 	return &Tado{
-		client: newClient(clientID, clientSecret),
+		client: newClient(ctx, config, token),
 	}
 }
 
-func (t *Tado) authenticate(ctx context.Context, username, password string) error {
-	if client, err := t.client.WithCredentials(ctx, username, password); err != nil {
-		return err
-	} else {
-		t.client = client
-		return nil
-	}
-}
-
-// Me authenticates with the given credentials and returns information about the
-// authenticated user.
-func (t *Tado) Me(ctx context.Context, username, password string) (*User, error) {
-	if err := t.authenticate(ctx, username, password); err != nil {
-		return nil, err
-	}
-
+// Me returns information about the authenticated user.
+func (t *Tado) Me(ctx context.Context) (*User, error) {
 	me := &User{client: t.client}
 	if err := t.client.get(ctx, apiURL("me"), me); err != nil {
 		return nil, err
