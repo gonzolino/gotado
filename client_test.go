@@ -5,13 +5,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/golang/mock/gomock"
-	oauth2int "github.com/gonzolino/gotado/v2/internal/oauth2"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 )
@@ -25,38 +21,6 @@ type mockHTTPClient struct {
 // Do returns the Response stored in the mockHTTPClient.
 func (c mockHTTPClient) Do(_ *http.Request) (*http.Response, error) {
 	return c.Response, c.Error
-}
-
-func TestWithCredentials(t *testing.T) {
-	ctrl, ctx := gomock.WithContext(context.Background(), t)
-
-	config := oauth2.Config{}
-	mockConfig := oauth2int.NewMockConfigInterface(ctrl)
-	oauth2int.NewConfig = func(clientID, clientSecret, authURL, tokenURL string, scopes []string) oauth2int.ConfigInterface {
-		return mockConfig
-	}
-	forbiddenError := &url.Error{}
-
-	token := &oauth2.Token{
-		AccessToken:  "access_token",
-		TokenType:    "token_type",
-		RefreshToken: "refresh_token",
-		Expiry:       time.Now(),
-	}
-
-	client := newClient("test", "test")
-	httpCtx := context.WithValue(ctx, oauth2.HTTPClient, client.http)
-
-	mockConfig.EXPECT().PasswordCredentialsToken(gomock.AssignableToTypeOf(httpCtx), "username", "password").Return(token, nil)
-	mockConfig.EXPECT().Client(httpCtx, token).Return(config.Client(httpCtx, token))
-
-	_, err := client.WithCredentials(ctx, "username", "password")
-	assert.NoError(t, err)
-
-	mockConfig.EXPECT().PasswordCredentialsToken(gomock.AssignableToTypeOf(httpCtx), "username", gomock.Not("password")).Return(nil, forbiddenError)
-
-	_, err = client.WithCredentials(ctx, "username", "wrong")
-	assert.Exactly(t, fmt.Errorf("invalid credentials: %w", forbiddenError), err)
 }
 
 func makeResponse(code int, body string) *http.Response {
@@ -138,13 +102,14 @@ func TestGet(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			client := newClient("test", "test")
+			client := newClient(ctx, &oauth2.Config{}, nil)
 			client.http = mockHTTPClient{Response: tc.mockResp, Error: tc.mockErr}
 
 			result := &foobar{}
-			err := client.get(context.Background(), tc.url, result)
+			err := client.get(ctx, tc.url, result)
 
 			if tc.wantErr != nil {
 				assert.EqualError(t, err, tc.wantErr.Error())
@@ -214,12 +179,13 @@ func TestPost(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			client := newClient("test", "test")
+			client := newClient(ctx, &oauth2.Config{}, nil)
 			client.http = mockHTTPClient{Response: tc.mockResp, Error: tc.mockErr}
 
-			err := client.post(context.Background(), tc.url)
+			err := client.post(ctx, tc.url)
 
 			if tc.wantErr != nil {
 				assert.EqualError(t, err, tc.wantErr.Error())
@@ -343,13 +309,14 @@ func TestPut(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			client := newClient("test", "test")
+			client := newClient(ctx, &oauth2.Config{}, nil)
 			client.http = mockHTTPClient{Response: tc.mockResp, Error: tc.mockErr}
 			data := tc.data
 
-			err := client.put(context.Background(), tc.url, data)
+			err := client.put(ctx, tc.url, data)
 
 			if tc.wantErr != nil {
 				assert.EqualError(t, err, tc.wantErr.Error())
@@ -418,12 +385,13 @@ func TestDelete(t *testing.T) {
 		},
 	}
 
+	ctx := context.Background()
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			client := newClient("test", "test")
+			client := newClient(ctx, &oauth2.Config{}, nil)
 			client.http = mockHTTPClient{Response: tc.mockResp, Error: tc.mockErr}
 
-			err := client.delete(context.Background(), tc.url)
+			err := client.delete(ctx, tc.url)
 
 			if tc.wantErr != nil {
 				assert.EqualError(t, err, tc.wantErr.Error())

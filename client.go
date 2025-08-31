@@ -9,13 +9,7 @@ import (
 	"net/http"
 	"reflect"
 
-	oauth2int "github.com/gonzolino/gotado/v2/internal/oauth2"
 	"golang.org/x/oauth2"
-)
-
-const (
-	authURL  = "https://auth.tado.com/oauth/authorize"
-	tokenURL = "https://auth.tado.com/oauth/token"
 )
 
 type HTTPClient interface {
@@ -24,20 +18,13 @@ type HTTPClient interface {
 
 // client to access the tado° API
 type client struct {
-	// ClientID specifies the client ID to use for authentication
-	ClientID string
-	// ClientSecret specifies the client secret to use for authentication
-	ClientSecret string
-
 	http HTTPClient
 }
 
 // newClient creates a new tado° client
-func newClient(clientID, clientSecret string) *client {
+func newClient(ctx context.Context, config *oauth2.Config, token *oauth2.Token) *client {
 	return &client{
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		http:         http.DefaultClient,
+		http: config.Client(ctx, token),
 	}
 }
 
@@ -45,22 +32,6 @@ func newClient(clientID, clientSecret string) *client {
 func (c *client) WithHTTPClient(httpClient *http.Client) *client {
 	c.http = httpClient
 	return c
-}
-
-// WithCredentials sets the given credentials and scopes for the tado° API
-func (c *client) WithCredentials(ctx context.Context, username, password string) (*client, error) {
-	config := oauth2int.NewConfig(c.ClientID, c.ClientSecret, authURL, tokenURL, []string{"home.user"})
-
-	httpContext := context.WithValue(ctx, oauth2.HTTPClient, c.http)
-	token, err := config.PasswordCredentialsToken(httpContext, username, password)
-	if err != nil {
-		return nil, fmt.Errorf("invalid credentials: %w", err)
-	}
-	authClient := config.Client(httpContext, token)
-
-	c.http = authClient
-
-	return c, nil
 }
 
 // Do sends the given HTTP request to the tado° API.
