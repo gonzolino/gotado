@@ -1,9 +1,8 @@
 module github.com/gonzolino/gotado/v2
 
-go 1.24.1
+go 1.25
 
 require (
-	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/oauth2 v0.30.0
 )
