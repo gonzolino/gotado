@@ -1,6 +1,6 @@
 # gotado
 
-[![Build Actions Status](https://github.com/gonzolino/gotado/workflows/Build/badge.svg)](https://github.com/gonzolino/gotado/actions) [![Go Report Card](https://goreportcard.com/badge/github.com/gonzolino/gotado)](https://goreportcard.com/report/github.com/gonzolino/gotado) [![PkgGoDev](https://pkg.go.dev/badge/github.com/gonzolino/gotado)](https://pkg.go.dev/github.com/gonzolino/gotado)
+[![CodeQL](https://github.com/gonzolino/gotado/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/gonzolino/gotado/actions/workflows/github-code-scanning/codeql) [![Go Report Card](https://goreportcard.com/badge/github.com/gonzolino/gotado)](https://goreportcard.com/report/github.com/gonzolino/gotado) [![PkgGoDev](https://pkg.go.dev/badge/github.com/gonzolino/gotado)](https://pkg.go.dev/github.com/gonzolino/gotado)
 
 Go client for the tado° Web API. Still in early development, so only a subset of the API functionality is implemented.
 
