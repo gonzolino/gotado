@@ -1,9 +1,9 @@
 package gotado
 
 import (
-"context"
+	"context"
 
-"golang.org/x/oauth2"
+	"golang.org/x/oauth2"
 )
 
 var Endpoint = oauth2.Endpoint{
@@ -42,15 +42,15 @@ func New(ctx context.Context, config *oauth2.Config, token *oauth2.Token) *Tado 
 // refreshed tokens to prevent re-authentication.
 //
 // Example:
-//   config := gotado.AuthConfig(clientID, "offline_access")
-//   token, _ := config.DeviceAccessToken(ctx, deviceAuth)
 //
-//   callback := func(newToken *oauth2.Token) {
-//       log.Println("Token refreshed, saving to disk")
-//       SaveTokenToEncryptedFile(newToken)
-//   }
+//	config := gotado.AuthConfig(clientID, "offline_access")
+//	token, _ := config.DeviceAccessToken(ctx, deviceAuth)
 //
-//   tado := gotado.NewWithTokenRefreshCallback(ctx, config, token, callback)
+//	callback := func(newToken *oauth2.Token) {
+//	    log.Println("Token refreshed, saving to disk")
+//	}
+//
+//	tado := gotado.NewWithTokenRefreshCallback(ctx, config, token, callback)
 //
 // Note: The callback is called synchronously. If you need to perform
 // heavy processing, consider sending the token to a channel for
