@@ -1,9 +1,9 @@
 package gotado
 
 import (
-	"context"
+"context"
 
-	"golang.org/x/oauth2"
+"golang.org/x/oauth2"
 )
 
 var Endpoint = oauth2.Endpoint{
@@ -30,6 +30,34 @@ func AuthConfig(clientID string, scopes ...string) *oauth2.Config {
 func New(ctx context.Context, config *oauth2.Config, token *oauth2.Token) *Tado {
 	return &Tado{
 		client: newClient(ctx, config, token),
+	}
+}
+
+// NewWithTokenRefreshCallback creates a new tado client with a callback
+// that is invoked whenever OAuth2 tokens are automatically refreshed.
+// This allows applications to persist refreshed tokens to storage.
+//
+// The tado° API uses refresh token rotation, meaning the old refresh token
+// is invalidated when a new one is issued. This makes it critical to save
+// refreshed tokens to prevent re-authentication.
+//
+// Example:
+//   config := gotado.AuthConfig(clientID, "offline_access")
+//   token, _ := config.DeviceAccessToken(ctx, deviceAuth)
+//
+//   callback := func(newToken *oauth2.Token) {
+//       log.Println("Token refreshed, saving to disk")
+//       SaveTokenToEncryptedFile(newToken)
+//   }
+//
+//   tado := gotado.NewWithTokenRefreshCallback(ctx, config, token, callback)
+//
+// Note: The callback is called synchronously. If you need to perform
+// heavy processing, consider sending the token to a channel for
+// asynchronous handling.
+func NewWithTokenRefreshCallback(ctx context.Context, config *oauth2.Config, token *oauth2.Token, callback TokenRefreshCallback) *Tado {
+	return &Tado{
+		client: newClientWithCallback(ctx, config, token, callback),
 	}
 }
 

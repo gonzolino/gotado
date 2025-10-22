@@ -1,15 +1,15 @@
 package gotado
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-	"reflect"
+"bytes"
+"context"
+"encoding/json"
+"fmt"
+"io"
+"net/http"
+"reflect"
 
-	"golang.org/x/oauth2"
+"golang.org/x/oauth2"
 )
 
 type HTTPClient interface {
@@ -25,6 +25,17 @@ type client struct {
 func newClient(ctx context.Context, config *oauth2.Config, token *oauth2.Token) *client {
 	return &client{
 		http: config.Client(ctx, token),
+	}
+}
+
+// newClientWithCallback creates a new tado° client with token refresh callback.
+// The callback will be invoked whenever the OAuth2 token is automatically refreshed.
+func newClientWithCallback(ctx context.Context, config *oauth2.Config, token *oauth2.Token, callback TokenRefreshCallback) *client {
+	tokenSrc := config.TokenSource(ctx, token)
+	callbackSrc := NewCallbackTokenSource(tokenSrc, callback)
+
+	return &client{
+		http: oauth2.NewClient(ctx, callbackSrc),
 	}
 }
 
@@ -110,7 +121,7 @@ func (c *client) put(ctx context.Context, url string, v interface{}) error {
 		return fmt.Errorf("unable to marshal object: %w", err)
 	}
 	resp, err := c.RequestWithHeaders(ctx, http.MethodPut, url, bytes.NewReader(data),
-		map[string]string{"Content-Type": "application/json;charset=utf-8"})
+map[string]string{"Content-Type": "application/json;charset=utf-8"})
 	if err != nil {
 		return err
 	}
