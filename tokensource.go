@@ -8,7 +8,8 @@ import (
 
 // TokenRefreshCallback is called whenever a token is automatically refreshed.
 // The callback receives the new token and should persist it to storage.
-// The callback is called synchronously and should return quickly.
+//
+// IMPORTANT: The callback is called synchronously and should return quickly.
 // If heavy processing is needed, consider sending the token to a channel
 // or queue for asynchronous processing.
 type TokenRefreshCallback func(token *oauth2.Token)
@@ -53,18 +54,22 @@ func (cts *callbackTokenSource) Token() (*oauth2.Token, error) {
 		}
 	}
 
-	// Invoke callback if token was refreshed
-	if tokenChanged && cts.callback != nil {
-		// Make a copy of the token to pass to the callback
-		// This prevents the callback from modifying the token
-		tokenCopy := &oauth2.Token{
-			AccessToken:  newToken.AccessToken,
-			TokenType:    newToken.TokenType,
-			RefreshToken: newToken.RefreshToken,
-			Expiry:       newToken.Expiry,
-		}
-		cts.callback(tokenCopy)
+	// Update lastToken if token changed
+	if tokenChanged {
 		cts.lastToken = newToken
+
+		// Invoke callback if provided
+		if cts.callback != nil {
+			// Make a copy of the token to pass to the callback
+			// This prevents the callback from modifying the token
+			tokenCopy := &oauth2.Token{
+				AccessToken:  newToken.AccessToken,
+				TokenType:    newToken.TokenType,
+				RefreshToken: newToken.RefreshToken,
+				Expiry:       newToken.Expiry,
+			}
+			cts.callback(tokenCopy)
+		}
 	}
 
 	return newToken, nil
