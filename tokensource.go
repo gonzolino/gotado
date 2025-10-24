@@ -73,6 +73,14 @@ func (cts *callbackTokenSource) Token() (*oauth2.Token, error) {
 				RefreshToken: newToken.RefreshToken,
 				Expiry:       newToken.Expiry,
 			}
+			// Copy Extra field if present
+			if newToken.Extra != nil {
+				extraCopy := make(map[string]interface{}, len(newToken.Extra))
+				for k, v := range newToken.Extra {
+					extraCopy[k] = v
+				}
+				tokenCopy.Extra = extraCopy
+			}
 			cts.callback(tokenCopy)
 		}
 	}
