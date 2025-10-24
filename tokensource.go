@@ -56,7 +56,12 @@ func (cts *callbackTokenSource) Token() (*oauth2.Token, error) {
 
 	// Update lastToken if token changed
 	if tokenChanged {
-		cts.lastToken = newToken
+		cts.lastToken = &oauth2.Token{
+			AccessToken:  newToken.AccessToken,
+			TokenType:    newToken.TokenType,
+			RefreshToken: newToken.RefreshToken,
+			Expiry:       newToken.Expiry,
+		}
 
 		// Invoke callback if provided
 		if cts.callback != nil {
