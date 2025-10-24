@@ -9,6 +9,12 @@ import (
 // TokenRefreshCallback is called whenever a token is automatically refreshed.
 // The callback receives the new token and should persist it to storage.
 //
+// The token passed to the callback contains the essential fields needed for
+// persistence (AccessToken, RefreshToken, TokenType, Expiry, ExpiresIn).
+// Extra fields stored via WithExtra() are intentionally not included to avoid
+// potential race conditions from sharing references to the original token's
+// internal data structures.
+//
 // IMPORTANT: The callback is called synchronously and should return quickly.
 // If heavy processing is needed, consider sending the token to a channel
 // or queue for asynchronous processing.
@@ -56,31 +62,13 @@ func (cts *callbackTokenSource) Token() (*oauth2.Token, error) {
 
 	// Update lastToken if token changed
 	if tokenChanged {
-		cts.lastToken = &oauth2.Token{
-			AccessToken:  newToken.AccessToken,
-			TokenType:    newToken.TokenType,
-			RefreshToken: newToken.RefreshToken,
-			Expiry:       newToken.Expiry,
-		}
+		cts.lastToken = copyToken(newToken)
 
 		// Invoke callback if provided
 		if cts.callback != nil {
 			// Make a copy of the token to pass to the callback
 			// This prevents the callback from modifying the token
-			tokenCopy := &oauth2.Token{
-				AccessToken:  newToken.AccessToken,
-				TokenType:    newToken.TokenType,
-				RefreshToken: newToken.RefreshToken,
-				Expiry:       newToken.Expiry,
-			}
-			// Copy Extra field if present
-			if newToken.Extra != nil {
-				extraCopy := make(map[string]interface{}, len(newToken.Extra))
-				for k, v := range newToken.Extra {
-					extraCopy[k] = v
-				}
-				tokenCopy.Extra = extraCopy
-			}
+			tokenCopy := copyToken(newToken)
 			cts.callback(tokenCopy)
 		}
 	}
@@ -112,5 +100,27 @@ func NewCallbackTokenSource(src oauth2.TokenSource, callback TokenRefreshCallbac
 	return &callbackTokenSource{
 		src:      src,
 		callback: callback,
+	}
+}
+
+// copyToken creates a copy of an oauth2.Token.
+// This creates a new token with the same field values as the source token.
+//
+// Note: Extra fields stored via WithExtra() are intentionally not copied.
+// The purpose of the callback is to persist the access and refresh tokens
+// for later use. Extra fields are not needed for token storage and excluding
+// them avoids potential race conditions from sharing references to the
+// original token's internal data structures.
+func copyToken(src *oauth2.Token) *oauth2.Token {
+	if src == nil {
+		return nil
+	}
+
+	return &oauth2.Token{
+		AccessToken:  src.AccessToken,
+		TokenType:    src.TokenType,
+		RefreshToken: src.RefreshToken,
+		Expiry:       src.Expiry,
+		ExpiresIn:    src.ExpiresIn,
 	}
 }
