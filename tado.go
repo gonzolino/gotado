@@ -10,6 +10,7 @@ var Endpoint = oauth2.Endpoint{
 	AuthURL:       "https://login.tado.com/oauth2/authorize",
 	TokenURL:      "https://login.tado.com/oauth2/token",
 	DeviceAuthURL: "https://login.tado.com/oauth2/device_authorize",
+	AuthStyle:     oauth2.AuthStyleInParams,
 }
 
 type Tado struct {
