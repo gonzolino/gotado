@@ -1,11 +1,96 @@
 package gotado
 
 import (
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"golang.org/x/oauth2"
 )
+
+// staticTokenSource returns the same token every time.
+type staticTokenSource struct {
+	token *oauth2.Token
+}
+
+func (s *staticTokenSource) Token() (*oauth2.Token, error) {
+	return s.token, nil
+}
+
+func TestCallbackTokenSource(t *testing.T) {
+	t.Run("NoCallbackWhenTokenUnchanged", func(t *testing.T) {
+		token := &oauth2.Token{
+			AccessToken:  "access",
+			RefreshToken: "refresh",
+		}
+
+		var callCount atomic.Int32
+		callback := func(newToken *oauth2.Token) {
+			callCount.Add(1)
+		}
+
+		src := NewCallbackTokenSource(&staticTokenSource{token: token}, callback, token)
+
+		// First call should NOT trigger callback since token matches initialToken
+		_, err := src.Token()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if callCount.Load() != 0 {
+			t.Errorf("callback should not fire when token unchanged, got %d calls", callCount.Load())
+		}
+	})
+
+	t.Run("CallbackWhenNilInitialToken", func(t *testing.T) {
+		token := &oauth2.Token{
+			AccessToken:  "access",
+			RefreshToken: "refresh",
+		}
+
+		var callCount atomic.Int32
+		callback := func(newToken *oauth2.Token) {
+			callCount.Add(1)
+		}
+
+		src := NewCallbackTokenSource(&staticTokenSource{token: token}, callback, nil)
+
+		// First call should trigger callback since initialToken is nil
+		_, err := src.Token()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if callCount.Load() != 1 {
+			t.Errorf("callback should fire when initialToken is nil, got %d calls", callCount.Load())
+		}
+	})
+
+	t.Run("CallbackWhenTokenChanges", func(t *testing.T) {
+		initialToken := &oauth2.Token{
+			AccessToken:  "access1",
+			RefreshToken: "refresh1",
+		}
+		newToken := &oauth2.Token{
+			AccessToken:  "access2",
+			RefreshToken: "refresh2",
+		}
+
+		var callCount atomic.Int32
+		callback := func(token *oauth2.Token) {
+			callCount.Add(1)
+		}
+
+		src := NewCallbackTokenSource(&staticTokenSource{token: newToken}, callback, initialToken)
+
+		// Should trigger callback since source returns a different token
+		_, err := src.Token()
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if callCount.Load() != 1 {
+			t.Errorf("callback should fire when token changes, got %d calls", callCount.Load())
+		}
+	})
+}
 
 func TestCopyToken(t *testing.T) {
 	t.Run("NilToken", func(t *testing.T) {

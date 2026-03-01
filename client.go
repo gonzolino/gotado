@@ -32,7 +32,7 @@ func newClient(ctx context.Context, config *oauth2.Config, token *oauth2.Token) 
 // The callback will be invoked whenever the OAuth2 token is automatically refreshed.
 func newClientWithCallback(ctx context.Context, config *oauth2.Config, token *oauth2.Token, callback TokenRefreshCallback) *client {
 	tokenSrc := config.TokenSource(ctx, token)
-	callbackTokenSrc := NewCallbackTokenSource(tokenSrc, callback)
+	callbackTokenSrc := NewCallbackTokenSource(tokenSrc, callback, token)
 
 	return &client{
 		http: oauth2.NewClient(ctx, callbackTokenSrc),
