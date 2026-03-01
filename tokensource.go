@@ -96,10 +96,15 @@ func (cts *callbackTokenSource) Token() (*oauth2.Token, error) {
 //	}
 //
 //	tado := gotado.NewWithTokenRefreshCallback(ctx, config, token, callback)
-func NewCallbackTokenSource(src oauth2.TokenSource, callback TokenRefreshCallback) oauth2.TokenSource {
+func NewCallbackTokenSource(src oauth2.TokenSource, callback TokenRefreshCallback, initialToken ...*oauth2.Token) oauth2.TokenSource {
+	var token *oauth2.Token
+	if len(initialToken) > 0 {
+		token = initialToken[0]
+	}
 	return &callbackTokenSource{
-		src:      src,
-		callback: callback,
+		src:       src,
+		callback:  callback,
+		lastToken: copyToken(token),
 	}
 }
 
